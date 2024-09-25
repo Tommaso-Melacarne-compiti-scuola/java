@@ -14,8 +14,8 @@ public class TagManager {
         tags.add(tag);
     }
 
-    public void removeTag(Tag tag) {
-        tags.remove(tag);
+    public void removeTagById(String uid) {
+        tags.removeIf(tag -> tag.getUid().equals(uid));
     }
 
     public ArrayList<Tag> getTags() {

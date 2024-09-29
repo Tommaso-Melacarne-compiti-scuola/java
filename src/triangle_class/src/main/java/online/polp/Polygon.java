@@ -9,11 +9,6 @@ public class Polygon {
         this.points = points;
     }
 
-    @SuppressWarnings("unused")
-    public Polygon(Polygon other) {
-        this(other.points);
-    }
-
     @Override
     public String toString() {
         return "Polygon{" +
@@ -58,6 +53,4 @@ public class Polygon {
 
         return Math.abs(area) / 2.0;
     }
-
-
 }

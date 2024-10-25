@@ -11,4 +11,9 @@ public class TerrainMonster extends Monster {
     protected int getDoubleAttackPercentage() {
         return ATTACK_PERCENTAGE;
     }
+
+    @Override
+    protected String getMonsterType() {
+        return "Terrain Monster";
+    }
 }

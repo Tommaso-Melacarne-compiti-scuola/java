@@ -19,7 +19,7 @@ public class MonsterAttackUtils {
 
 
     /**
-     * Returns whether the monster will perform a double attack
+     * Returns whether the monster will perform a double attack, based on the double attack percentage
      *
      * @param doubleAttackPercentage the double attack percentage
      * @return whether the monster will perform a double attack

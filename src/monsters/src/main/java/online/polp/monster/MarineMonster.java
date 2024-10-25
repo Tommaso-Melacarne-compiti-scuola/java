@@ -11,4 +11,9 @@ public class MarineMonster extends Monster {
     protected int getDoubleAttackPercentage() {
         return ATTACK_PERCENTAGE;
     }
+
+    @Override
+    protected String getMonsterType() {
+        return "Marine Monster";
+    }
 }

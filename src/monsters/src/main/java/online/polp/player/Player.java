@@ -1,37 +1,22 @@
 package online.polp.player;
 
+import online.polp.colorize.Color;
 import online.polp.monster.Monster;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Player {
-    private final String name;
-    private final String lastName;
-    private final Monster monster;
-
-    public Player(String name, String lastName, Monster monster) {
-        this.name = name;
-        this.lastName = lastName;
-        this.monster = monster;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
+public record Player(String name, String lastName, Monster monster, Color color) {
     public String getFullName() {
-        return name + " " + lastName;
+        return color.colorize(name + " " + lastName);
     }
 
-    public Monster getMonster() {
-        return monster;
-    }
-
+    /**
+     * Challenge another player
+     *
+     * @param otherPlayer the other player to challenge
+     * @return the result of the challenge
+     */
     public ChallengeResult challenge(Player otherPlayer) {
         List<AttackResult> attackResults = new ArrayList<>();
 
@@ -80,6 +65,6 @@ public class Player {
 
     @Override
     public String toString() {
-        return "Player " + getFullName() + " " + lastName + " with monster\n" + monster;
+        return "Player " + getFullName() + " with \n" + monster;
     }
 }

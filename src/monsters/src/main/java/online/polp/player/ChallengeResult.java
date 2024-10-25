@@ -1,49 +1,24 @@
 package online.polp.player;
 
+import online.polp.colorize.Color;
+
 import java.util.List;
 
-public class ChallengeResult {
-    private final Player challenger;
-    private final Player challenged;
-    private final ChallengeFinalResult challengeFinalResult;
-    private final List<AttackResult> attackResults;
-
-    public ChallengeResult(Player challenger, Player challenged, ChallengeFinalResult challengeFinalResult, List<AttackResult> attackResults) {
-        this.challenger = challenger;
-        this.challenged = challenged;
-        this.challengeFinalResult = challengeFinalResult;
-        this.attackResults = attackResults;
-    }
-
-    public Player getChallenger() {
-        return challenger;
-    }
-
-    public Player getChallenged() {
-        return challenged;
-    }
-
-    public ChallengeFinalResult getChallengeFinalResult() {
-        return challengeFinalResult;
-    }
-
-    public List<AttackResult> getAttackResults() {
-        return attackResults;
-    }
+public record ChallengeResult(Player challenger, Player challenged, ChallengeFinalResult challengeFinalResult,
+                              List<AttackResult> attackResults) {
 
     @Override
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder("Here's what happened:\n");
+        StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < attackResults.size(); i++) {
             AttackResult attackResult = attackResults.get(i);
 
-            stringBuilder.append("Turn ").append(i + 1).append(": ");
-
+            sb.append("Turn ").append(i + 1).append(": ");
 
             String attackerName, defenderName;
 
-            if (TurnPlayer.Challenger == attackResult.getTurnPlayer()) {
+            if (TurnPlayer.Challenger == attackResult.turnPlayer()) {
                 attackerName = challenger.getFullName();
                 defenderName = challenged.getFullName();
             } else {
@@ -51,15 +26,15 @@ public class ChallengeResult {
                 defenderName = challenger.getFullName();
             }
 
-            stringBuilder.append(attackerName).append(" attacks ").append(defenderName).append(" for ").append(attackResult.getDamage()).append(" damage");
+            sb.append(attackerName).append(" attacks ").append(defenderName).append(" for ").append(attackResult.damage()).append(" damage");
 
             if (attackResult.isDoubleAttack()) {
-                stringBuilder.append(" and gets a double attack");
+                sb.append(" and gets a ").append(Color.RED.colorize("double attack"));
             }
 
-            stringBuilder.append(" (").append(attackResult.getInitialHealth()).append(" -> ").append(attackResult.getFinalHealth()).append(")");
+            sb.append(" (").append(attackResult.initialHealth()).append(" -> ").append(attackResult.finalHealth()).append(")");
 
-            stringBuilder.append("\n");
+            sb.append("\n");
         }
 
 
@@ -68,11 +43,11 @@ public class ChallengeResult {
         switch (challengeFinalResult) {
             case challengerMonsterAlreadyDefeated:
                 winnerName = challenged.getFullName();
-                stringBuilder.append(challenged.getFullName()).append(" wins because ").append(challenger.getFullName()).append(" monster is already defeated\n");
+                sb.append(challenged.getFullName()).append(" wins because ").append(challenger.getFullName()).append(" monster is already defeated\n");
                 break;
             case challengedMonsterAlreadyDefeated:
                 winnerName = challenger.getFullName();
-                stringBuilder.append(challenger.getFullName()).append(" wins because ").append(challenged.getFullName()).append(" monster is already defeated\n");
+                sb.append(challenger.getFullName()).append(" wins because ").append(challenged.getFullName()).append(" monster is already defeated\n");
                 break;
             case challengerWins:
                 winnerName = challenger.getFullName();
@@ -82,9 +57,9 @@ public class ChallengeResult {
                 break;
         }
 
-        stringBuilder.append("Challenge Result: ").append(winnerName).append(" wins");
+        sb.append(Color.YELLOW.colorize("Challenge Result: ")).append(winnerName).append(" wins");
 
-        return stringBuilder.toString();
+        return sb.toString();
     }
 
 }

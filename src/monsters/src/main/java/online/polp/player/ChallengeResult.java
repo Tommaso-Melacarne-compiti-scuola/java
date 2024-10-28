@@ -16,20 +16,23 @@ public record ChallengeResult(Player challenger, Player challenged, ChallengeFin
 
         String winnerName = null;
 
+        String challengerFullName = challenger.getFullName();
+        String challengedFullName = challenged.getFullName();
+
         switch (challengeFinalResult) {
             case challengerMonsterAlreadyDefeated:
-                winnerName = challenged.getFullName();
-                sb.append(challenged.getFullName()).append(" wins because ").append(challenger.getFullName()).append(" monster is already defeated\n");
+                winnerName = challengedFullName;
+                sb.append(challengedFullName).append(" wins because ").append(challengerFullName).append(" monster is already defeated\n");
                 break;
             case challengedMonsterAlreadyDefeated:
-                winnerName = challenger.getFullName();
-                sb.append(challenger.getFullName()).append(" wins because ").append(challenged.getFullName()).append(" monster is already defeated\n");
+                winnerName = challengerFullName;
+                sb.append(challengerFullName).append(" wins because ").append(challengedFullName).append(" monster is already defeated\n");
                 break;
             case challengerWins:
-                winnerName = challenger.getFullName();
+                winnerName = challengerFullName;
                 break;
             case challengedWins:
-                winnerName = challenged.getFullName();
+                winnerName = challengedFullName;
                 break;
         }
 
@@ -40,19 +43,28 @@ public record ChallengeResult(Player challenger, Player challenged, ChallengeFin
 
     private void appendTurnToString(AttackResult attackResult, int turn, StringBuilder sb) {
         sb.append("Turn ").append(turn + 1).append(": ");
+
         String attackerName, defenderName;
+
+        String challengerFullName = challenger.getFullName();
+        String challengedFullName = challenged.getFullName();
+
         if (TurnPlayer.Challenger == attackResult.turnPlayer()) {
-            attackerName = challenger.getFullName();
-            defenderName = challenged.getFullName();
+            attackerName = challengerFullName;
+            defenderName = challengedFullName;
         } else {
-            attackerName = challenged.getFullName();
-            defenderName = challenger.getFullName();
+            attackerName = challengedFullName;
+            defenderName = challengerFullName;
         }
+
         sb.append(attackerName).append(" attacks ").append(defenderName).append(" for ").append(attackResult.damage()).append(" damage");
+
         if (attackResult.isDoubleAttack()) {
             sb.append(" and gets a ").append(Color.RED.colorize("double attack"));
         }
+
         sb.append(" (").append(attackResult.initialHealth()).append(" -> ").append(attackResult.finalHealth()).append(")");
+
         sb.append("\n");
     }
 }

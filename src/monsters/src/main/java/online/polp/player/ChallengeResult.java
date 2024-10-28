@@ -6,37 +6,13 @@ import java.util.List;
 
 public record ChallengeResult(Player challenger, Player challenged, ChallengeFinalResult challengeFinalResult,
                               List<AttackResult> attackResults) {
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < attackResults.size(); i++) {
-            AttackResult attackResult = attackResults.get(i);
-
-            sb.append("Turn ").append(i + 1).append(": ");
-
-            String attackerName, defenderName;
-
-            if (TurnPlayer.Challenger == attackResult.turnPlayer()) {
-                attackerName = challenger.getFullName();
-                defenderName = challenged.getFullName();
-            } else {
-                attackerName = challenged.getFullName();
-                defenderName = challenger.getFullName();
-            }
-
-            sb.append(attackerName).append(" attacks ").append(defenderName).append(" for ").append(attackResult.damage()).append(" damage");
-
-            if (attackResult.isDoubleAttack()) {
-                sb.append(" and gets a ").append(Color.RED.colorize("double attack"));
-            }
-
-            sb.append(" (").append(attackResult.initialHealth()).append(" -> ").append(attackResult.finalHealth()).append(")");
-
-            sb.append("\n");
+            appendTurnToString(attackResults.get(i), i, sb);
         }
-
 
         String winnerName = null;
 
@@ -62,4 +38,21 @@ public record ChallengeResult(Player challenger, Player challenged, ChallengeFin
         return sb.toString();
     }
 
+    private void appendTurnToString(AttackResult attackResult, int turn, StringBuilder sb) {
+        sb.append("Turn ").append(turn + 1).append(": ");
+        String attackerName, defenderName;
+        if (TurnPlayer.Challenger == attackResult.turnPlayer()) {
+            attackerName = challenger.getFullName();
+            defenderName = challenged.getFullName();
+        } else {
+            attackerName = challenged.getFullName();
+            defenderName = challenger.getFullName();
+        }
+        sb.append(attackerName).append(" attacks ").append(defenderName).append(" for ").append(attackResult.damage()).append(" damage");
+        if (attackResult.isDoubleAttack()) {
+            sb.append(" and gets a ").append(Color.RED.colorize("double attack"));
+        }
+        sb.append(" (").append(attackResult.initialHealth()).append(" -> ").append(attackResult.finalHealth()).append(")");
+        sb.append("\n");
+    }
 }

@@ -18,11 +18,6 @@ public enum Color {
         this.color = color;
     }
 
-    public String getColor() {
-        return color;
-    }
-
-
     /**
      * Colorizes the given text with this color
      *
@@ -30,7 +25,7 @@ public enum Color {
      * @return the colorized text
      */
     public String colorize(String text) {
-        return color + text + RESET.getColor();
+        return color + text + RESET.color;
     }
 
 

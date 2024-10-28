@@ -36,7 +36,6 @@ public record Player(String name, String lastName, Monster monster, Color color)
             boolean isFirstPlayerTurn = turn % 2 == 0;
             TurnPlayer turnPlayer = isFirstPlayerTurn ? TurnPlayer.Challenger : TurnPlayer.Challenged;
 
-
             if (isFirstPlayerTurn) {
                 AttackResult attackResult = this.monster.attack(otherPlayer.monster, turnPlayer);
 

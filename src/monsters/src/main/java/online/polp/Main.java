@@ -37,7 +37,6 @@ public class Main {
         }
     }
 
-
     /**
      * Start the challenges between all the players
      *

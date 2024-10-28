@@ -19,19 +19,17 @@ public abstract class Monster {
         this.name = name;
     }
 
-
     /**
      * Takes the given damage from the monster's health
      *
      * @param damage the damage to take
      */
-    public void takeDamage(int damage) {
+    private void takeDamage(int damage) {
         health -= damage;
         if (health < 0) {
             health = 0;
         }
     }
-
 
     /**
      * Attacks the other monster
@@ -51,17 +49,13 @@ public abstract class Monster {
             randomizedAttack *= 2;
         }
 
-        int initialHealth = other.getHealth();
+        int initialHealth = other.health;
 
         other.takeDamage(randomizedAttack);
 
-        int finalHealth = other.getHealth();
+        int finalHealth = other.health;
 
         return new AttackResult(initialHealth, finalHealth, randomizedAttack, isDoubleAttack, turnPlayer);
-    }
-
-    public int getHealth() {
-        return health;
     }
 
     public boolean isAlive() {

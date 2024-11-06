@@ -48,7 +48,7 @@ public class Main {
             fridge.toDisk(filename);
             System.out.println("Frigorifero salvato su file: " + filename);
 
-            Fridge restoredFridge = Fridge.fromDisk(fccdilename);
+            Fridge restoredFridge = Fridge.fromDisk(filename);
             System.out.println("Frigorifero ripristinato da file: " + filename);
 
             System.out.println("Elenco di tutti i prodotti presenti nel frigorifero ripristinato:");

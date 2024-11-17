@@ -33,11 +33,7 @@ public class StudentManager implements StudentOperations {
                 .collect(
                         Collectors.toMap(
                                 Student::getName,
-                                Student::getAverageGrade,
-                                (_, _) -> {
-                                    throw new IllegalStateException("Duplicate student in the list");
-                                },
-                                HashMap::new
+                                Student::getAverageGrade
                         )
                 );
     }

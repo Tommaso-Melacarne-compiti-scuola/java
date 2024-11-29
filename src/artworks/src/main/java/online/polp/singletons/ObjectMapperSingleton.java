@@ -13,9 +13,6 @@ public class ObjectMapperSingleton {
     static {
         INSTANCE.registerModule(new JavaTimeModule());
         INSTANCE.enable(SerializationFeature.INDENT_OUTPUT);
-
-        INSTANCE.registerSubtypes(new NamedType(Sculpture.class, "sculpture"));
-        INSTANCE.registerSubtypes(new NamedType(Painting.class, "painting"));
     }
 
     private ObjectMapperSingleton() {

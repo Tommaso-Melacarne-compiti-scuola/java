@@ -14,7 +14,7 @@ public class ArtworkMenu {
         System.out.println("2. Add a new painting");
         System.out.println("3. List all artworks");
         System.out.println("4. Save artworks to disk");
-        System.out.println("5. Load artworks from disk");
+        System.out.println("5. Load artworks from the disk");
         System.out.println("0. Exit");
     }
 

@@ -40,16 +40,4 @@ public abstract class AbstractArtwork {
     public int getYear() {
         return year;
     }
-
-    public void setYear(int year) {
-        this.year = year;
-    }
-
-    public void setArtist(String artist) {
-        this.artist = artist;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
 }

@@ -3,7 +3,6 @@ package online.polp;
 public class Painting extends AbstractArtwork {
     private String medium;
 
-
     @SuppressWarnings("unused")
     public Painting() {
     }

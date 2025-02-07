@@ -22,4 +22,16 @@ public class TicTacToeModel {
     public static CurrentState getCurrentState() {
         return new CurrentState(turn % 2 == 0 ? CellType.CROSS : CellType.CIRCLE, grid);
     }
+
+    public static GameStatus getGameStatus() {
+        if (grid.hasWinner()) {
+            return turn % 2 == 1 ? GameStatus.X_WINS : GameStatus.O_WINS;
+        }
+
+        if (grid.isFull()) {
+            return GameStatus.DRAW;
+        }
+
+        return GameStatus.RUNNING;
+    }
 }

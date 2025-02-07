@@ -5,8 +5,9 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import online.polp.model.CellType;
-import online.polp.model.TicTacToeModel;
 import online.polp.model.CurrentState;
+import online.polp.model.GameStatus;
+import online.polp.model.TicTacToeModel;
 
 public class PrimaryController {
     @FXML
@@ -39,6 +40,11 @@ public class PrimaryController {
     private void handleClick(int row, int col) {
         TicTacToeModel.makePlay(row, col);
         rerenderGrid(TicTacToeModel.getCurrentState());
+
+        GameStatus gameStatus = TicTacToeModel.getGameStatus();
+        if (!gameStatus.equals(GameStatus.RUNNING)) {
+            turnIndicator.setText(gameStatus.getMessage());
+        }
     }
 
     private void rerenderGrid(CurrentState currentState) {

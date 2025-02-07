@@ -5,21 +5,21 @@ import lombok.Getter;
 public class TicTacToeModel {
     @Getter
     private static final Grid grid = new Grid();
-    private static int playerClicking = 0;
+    private static int turn = 0;
 
     public static void makePlay(int row, int col) {
         if (grid.getRowAndColumn(row, col) != CellType.EMPTY) {
             return;
         }
 
-        CellType cellType = playerClicking % 2 == 0 ? CellType.CROSS : CellType.CIRCLE;
+        CellType cellType = turn % 2 == 0 ? CellType.CROSS : CellType.CIRCLE;
 
         grid.setRowAndColumn(row, col, cellType);
 
-        playerClicking++;
+        turn++;
     }
 
     public static UpdateInfo getUpdateInfo() {
-        return new UpdateInfo(playerClicking % 2, grid);
+        return new UpdateInfo(turn % 2 == 0 ? CellType.CROSS : CellType.CIRCLE, grid);
     }
 }

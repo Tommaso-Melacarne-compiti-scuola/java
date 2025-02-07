@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class UpdateInfo {
-    private final int nextPlayer;
+    private final CellType nextPlayer;
     private final Grid grid;
 }

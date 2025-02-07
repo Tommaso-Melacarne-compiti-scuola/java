@@ -19,7 +19,7 @@ public class TicTacToeModel {
         turn++;
     }
 
-    public static UpdateInfo getUpdateInfo() {
-        return new UpdateInfo(turn % 2 == 0 ? CellType.CROSS : CellType.CIRCLE, grid);
+    public static CurrentState getCurrentState() {
+        return new CurrentState(turn % 2 == 0 ? CellType.CROSS : CellType.CIRCLE, grid);
     }
 }

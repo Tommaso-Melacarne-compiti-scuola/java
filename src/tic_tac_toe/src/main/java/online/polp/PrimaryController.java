@@ -6,7 +6,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import online.polp.model.CellType;
 import online.polp.model.TicTacToeModel;
-import online.polp.model.UpdateInfo;
+import online.polp.model.CurrentState;
 
 public class PrimaryController {
     @FXML
@@ -38,10 +38,10 @@ public class PrimaryController {
 
     private void handleClick(int row, int col) {
         TicTacToeModel.makePlay(row, col);
-        rerenderUpdate(TicTacToeModel.getUpdateInfo());
+        rerenderGrid(TicTacToeModel.getCurrentState());
     }
 
-    private void rerenderUpdate(UpdateInfo updateInfo) {
+    private void rerenderGrid(CurrentState currentState) {
         // Get the number of rows and columns of the grid pane
         int numRows = gridPane.getRowConstraints().size();
         int numCols = gridPane.getColumnConstraints().size();
@@ -49,13 +49,13 @@ public class PrimaryController {
         // Iterate over the grid pane to update the content of each cell
         for (int i = 0; i < numRows; i++) {
             for (int j = 0; j < numCols; j++) {
-                Button button = (Button) gridPane.getChildren().get(i * numCols + j + 1);
-                CellType rowAndColumn = updateInfo.getGrid().getRowAndColumn(i, j);
+                Button gridButton = (Button) gridPane.getChildren().get(i * numCols + j + 1);
+                CellType modelCell = currentState.getGrid().getRowAndColumn(i, j);
 
-                button.setText(rowAndColumn.toString());
+                gridButton.setText(modelCell.toString());
             }
         }
 
-        turnIndicator.setText("It's " + updateInfo.getNextPlayer() + "'s turn");
+        turnIndicator.setText("It's " + currentState.getNextPlayer() + "'s turn");
     }
 }

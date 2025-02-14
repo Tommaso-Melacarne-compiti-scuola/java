@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Battleship" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="polp.online.App" />
+    <module name="battleshipFx" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

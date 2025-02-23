@@ -1,6 +1,5 @@
 .board-button {
     -fx-min-width: 50px;
     -fx-min-height: 50px;
-    -fx-border-color: #000;
-    -fx-background-color: #fff;
+    -fx-background-radius: 0;
 }

@@ -2,9 +2,11 @@ package polp.online;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.layout.*;
-import polp.online.model.BattleshipModel;
-import polp.online.model.Player;
+import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.RowConstraints;
+import polp.online.model.*;
 
 import java.util.List;
 
@@ -12,46 +14,60 @@ public class PrimaryController {
     @FXML
     private HBox mainHbox;
 
-    private int player1Id;
-    private int player2Id;
+    private int humanId;
+    private int pcId;
 
     @FXML
     private void initialize() {
-        Player player1 = new Player("Player 1");
-        Player player2 = new Player("Player 2");
+        Player humanPlayer = new Player("Human");
+        Player pcPlayer = new Player("PC");
 
-        BattleshipModel.addPlayer(player1);
-        BattleshipModel.addPlayer(player2);
+        BattleshipModel.addPlayer(humanPlayer);
+        BattleshipModel.addPlayer(pcPlayer);
 
-        player1Id = player1.getId();
-        player2Id = player2.getId();
+        humanId = humanPlayer.getId();
+        pcId = pcPlayer.getId();
 
-        renderBoard(player1Id, player2Id, true);
+        // TODO: Add ships to the boards manually for player 1
+        BattleshipModel.getPlayerById(humanId).getBoard().addRandomShips();
+
+        BattleshipModel.getPlayerById(pcId).getBoard().addRandomShips();
+
+        List<Integer> playerIds = List.of(humanId, pcId);
+
+        renderBoard(playerIds, true);
     }
 
-    private void renderBoard(int player1Id, int player2Id, boolean firstRender) {
-        List<Hit> player1Hits = BattleshipModel.getPlayerById(player1Id).getBoard().getHits();
-        List<Hit> player2Hits = BattleshipModel.getPlayerById(player2Id).getBoard().getHits();
-
+    private void renderBoard(List<Integer> playerIds, boolean firstRender) {
         mainHbox.getChildren().clear();
 
-        GridPane playerBoard = createBoard(firstRender);
-        fillBoard(playerBoard, player1Hits);
-        mainHbox.getChildren().add(playerBoard);
+        for (int playerId : playerIds) {
+            Board board = BattleshipModel.getPlayerById(playerId).getBoard();
+            List<Hit> hits = board.getHits();
+            List<Ship> ships = board.getShips();
 
-        GridPane pcBoard = createBoard(!firstRender);
-        fillBoard(pcBoard, player2Hits);
-        mainHbox.getChildren().add(pcBoard);
+            GridPane boardGrid = createBoard(firstRender);
+            fillBoard(boardGrid, hits, ships);
+            mainHbox.getChildren().add(boardGrid);
+        }
     }
 
-    private void fillBoard(GridPane board, List<Hit> hits) {
+    private void fillBoard(GridPane board, List<Hit> hits, List<Ship> ships) {
+        for (Ship ship : ships) {
+            for (Point point : ship.getPoints()) {
+                Button button = (Button) board.getChildren().get(point.getX() + point.getY() * 10);
+                button.getStyleClass().add("ship-button");
+            }
+        }
+
+
         for (Hit hit : hits) {
             Button button = (Button) board.getChildren().get(hit.getX() + hit.getY() * 10);
 
             String classToInject = switch (hit.getResult()) {
-                case HIT -> "hit";
-                case SUNK -> "sunk";
-                case MISS -> "miss";
+                case HIT -> "hit-button";
+                case SUNK -> "sunk-button";
+                case MISS -> "miss-button";
             };
 
             button.getStyleClass().add(classToInject);

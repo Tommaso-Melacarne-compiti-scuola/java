@@ -1,26 +1,16 @@
 package polp.online.model;
 
-import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import polp.online.Hit;
 
 import java.util.List;
 
 @Data
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
 public class Ship {
     private final Point position;
     private final int length;
     private final Orientation orientation;
-
-    public Ship(Point start, int length, Orientation orientation, int boardSize) {
-        this(start, length, orientation);
-
-        if (!isInsideBoard(boardSize)) {
-            throw new IllegalArgumentException("Invalid ship: outside the board boundaries");
-        }
-    }
 
     public boolean isHit(Point point) {
         Point end = position.extendInDirection(orientation, length - 1);
@@ -48,5 +38,22 @@ public class Ship {
         }
 
         return true;
+    }
+
+    /**
+     * Check if this ship collides with another ship
+     *
+     * @param other The other ship
+     * @return true if the ships collide, false otherwise
+     */
+    public boolean collidesWith(Ship other) {
+        Point end = position.extendInDirection(orientation, length - 1);
+
+        return position.isInsideRectangle(other.position, other.position.extendInDirection(other.orientation, other.length - 1)) ||
+               other.position.isInsideRectangle(position, end);
+    }
+
+    public List<Point> getPoints() {
+        return position.getPointsInDirection(orientation, length);
     }
 }

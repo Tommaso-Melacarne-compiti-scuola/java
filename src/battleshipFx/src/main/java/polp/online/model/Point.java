@@ -1,6 +1,11 @@
 package polp.online.model;
 
 import lombok.*;
+import polp.online.singletons.RandomSingleton;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 @Data
 @RequiredArgsConstructor
@@ -50,5 +55,25 @@ public class Point {
 
     public Point add(Point point) {
         return new Point(x + point.x, y + point.y);
+    }
+
+    public static Point randomPoint(int maxX, int maxY) {
+        Random random = RandomSingleton.getInstance();
+
+        return new Point(random.nextInt(maxX), random.nextInt(maxY));
+    }
+
+    public static Point randomPoint(int maxXY) {
+        return randomPoint(maxXY, maxXY);
+    }
+
+    public List<Point> getPointsInDirection(Orientation orientation, int length) {
+        List<Point> points = new ArrayList<>(length);
+
+        for (int i = 0; i < length; i++) {
+            points.add(extendInDirection(orientation, i));
+        }
+
+        return points;
     }
 }

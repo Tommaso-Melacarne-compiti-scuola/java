@@ -3,3 +3,19 @@
     -fx-min-height: 50px;
     -fx-background-radius: 0;
 }
+
+.ship-button {
+    -fx-background-color: #0000FF;
+}
+
+.hit-button {
+    -fx-background-color: #FF0000;
+}
+
+.sunk-button {
+    -fx-background-color: #000103;
+}
+
+.miss-button {
+    -fx-background-color: #FFFFFF;
+}

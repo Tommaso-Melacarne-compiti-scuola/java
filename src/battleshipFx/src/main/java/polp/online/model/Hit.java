@@ -1,8 +1,6 @@
-package polp.online;
+package polp.online.model;
 
 import lombok.*;
-import polp.online.model.AttackResult;
-import polp.online.model.Point;
 
 @Data
 @EqualsAndHashCode(callSuper = true)

@@ -2,10 +2,11 @@
     -fx-min-width: 50px;
     -fx-min-height: 50px;
     -fx-background-radius: 0;
+    -fx-background-color: #00ceff;
 }
 
 .ship-button {
-    -fx-background-color: #0000FF;
+    -fx-background-color: #6e2f16;
 }
 
 .hit-button {

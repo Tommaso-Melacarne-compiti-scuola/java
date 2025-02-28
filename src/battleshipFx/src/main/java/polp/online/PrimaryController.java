@@ -5,33 +5,33 @@ import javafx.scene.layout.HBox;
 import polp.online.model.*;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 public class PrimaryController {
     @FXML
     private HBox mainHbox;
 
-    private int humanId;
-    private int pcId;
+    private final Player humanPlayer = new Player("Human");
+    private final Player pcPlayer = new Player("PC");
+
+    public PrimaryController() {
+        // TODO: Add ships to the boards manually for human player
+        humanPlayer.getBoard().addRandomShips();
+
+        pcPlayer.getBoard().addRandomShips();
+
+        List<Player> players = List.of(humanPlayer, pcPlayer);
+
+        for (Player player : players) {
+            BattleshipModel.addPlayer(player);
+        }
+    }
 
     @FXML
     private void initialize() {
-        Player humanPlayer = new Player("Human");
-        Player pcPlayer = new Player("PC");
+        List<Integer> playerIds = Stream.of(humanPlayer, pcPlayer).map(Player::getId).toList();
 
-        BattleshipModel.addPlayer(humanPlayer);
-        BattleshipModel.addPlayer(pcPlayer);
-
-        humanId = humanPlayer.getId();
-        pcId = pcPlayer.getId();
-
-        // TODO: Add ships to the boards manually for player 1
-        BattleshipModel.getPlayerById(humanId).getBoard().addRandomShips();
-
-        BattleshipModel.getPlayerById(pcId).getBoard().addRandomShips();
-
-        List<Integer> playerIds = List.of(humanId, pcId);
-
-        renderBoard(playerIds, true);
+        renderBoard(playerIds, false);
     }
 
     private void renderBoard(List<Integer> playerIds, boolean gameDidNotStart) {

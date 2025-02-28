@@ -12,4 +12,11 @@ public class BattleshipModel {
     public static void addPlayer(Player player) {
         players.add(player);
     }
+
+    public static Player getPlayerById(int id) {
+        return players.stream()
+                      .filter(player -> player.getId() == id)
+                      .findFirst()
+                      .orElse(null);
+    }
 }

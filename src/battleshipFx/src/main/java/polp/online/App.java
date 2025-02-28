@@ -19,7 +19,7 @@ public class App extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("primary"), 540, 600);
+        scene = new Scene(loadFXML("primary"), 1080, 600);
         Application.setUserAgentStylesheet(new PrimerDark().getUserAgentStylesheet());
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("style.css")).toExternalForm());
         stage.setScene(scene);

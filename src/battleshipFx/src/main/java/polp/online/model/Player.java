@@ -1,13 +1,20 @@
 package polp.online.model;
 
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
-@RequiredArgsConstructor
 @Getter
 public class Player {
+    private static int nextId = 0;
+
+    private final int id;
     private final String name;
     private final Board board = new Board();
+
+    public Player(String name) {
+        this.id = nextId;
+        nextId++;
+        this.name = name;
+    }
 
     /**
      * Attacks a point on this player's board

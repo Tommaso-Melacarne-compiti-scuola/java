@@ -1,5 +1,6 @@
 package polp.online.model;
 
+import lombok.Getter;
 import polp.online.Hit;
 
 import java.util.ArrayList;
@@ -7,6 +8,7 @@ import java.util.List;
 
 public class Board {
     private final List<Ship> ships = new ArrayList<>();
+    @Getter
     private final List<Hit> hits = new ArrayList<>();
 
     public void addShip(Ship ship) {

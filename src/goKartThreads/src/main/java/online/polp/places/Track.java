@@ -16,7 +16,7 @@ public class Track {
         this.semaphore = new Semaphore(capacity, true);
     }
 
-    public void use(int driverId, int numLaps) throws InterruptedException {
+    public void use(int driverId, int numLaps, Color driverColor) throws InterruptedException {
         Random random = RandomSingleton.getInstance();
 
         semaphore.acquire();
@@ -30,6 +30,6 @@ public class Track {
         long duration = System.currentTimeMillis() - startTime;
 
         semaphore.release();
-        Color.RED.printWithColor("Driver " + driverId + " used the track for " + duration + " ms");
+        driverColor.printWithColor("Driver " + driverId + " used the track for " + duration + " ms");
     }
 }

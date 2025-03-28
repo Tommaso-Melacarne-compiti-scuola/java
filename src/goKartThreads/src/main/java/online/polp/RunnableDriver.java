@@ -12,17 +12,18 @@ public class RunnableDriver implements Runnable {
     private final int id;
     private final ChangingRoom changingRoom;
     private final Track track;
+    private final Color color;
 
     @Override
     public void run() {
         try {
-            Color.BLUE.printWithColor("Driver " + id + " arrives");
+            color.printWithColor("Driver " + id + " arrives");
 
-            changingRoom.use(id);
-            track.use(id, LAPS);
-            changingRoom.use(id);
+            changingRoom.use(id, color);
+            track.use(id, LAPS, color);
+            changingRoom.use(id, color);
 
-            Color.BLUE.printWithColor("Driver " + id + " has finished");
+            color.printWithColor("Driver " + id + " has finished");
         } catch (InterruptedException e) {
             //noinspection CallToPrintStackTrace
             e.printStackTrace();

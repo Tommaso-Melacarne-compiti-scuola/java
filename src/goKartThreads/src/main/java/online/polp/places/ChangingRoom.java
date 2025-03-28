@@ -16,7 +16,7 @@ public class ChangingRoom {
         this.semaphore = new Semaphore(capacity, true); // Fair semaphore
     }
 
-    public void use(int driverId) throws InterruptedException {
+    public void use(int driverId, Color driverColor) throws InterruptedException {
         Random random = RandomSingleton.getInstance();
         semaphore.acquire();
         
@@ -27,6 +27,6 @@ public class ChangingRoom {
         long duration = System.currentTimeMillis() - startTime;
         
         semaphore.release();
-        Color.YELLOW.printWithColor("Driver " + driverId + " used the changing room for " + duration + " ms");
+        driverColor.printWithColor("Driver " + driverId + " used the changing room for " + duration + " ms");
     }
 }

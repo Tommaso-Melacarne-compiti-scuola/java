@@ -5,13 +5,14 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.stream.Stream;
 
 import static online.polp.utils.ListUtils.chunkList;
 
 public class ParallelCalculator {
     public static final int MAX_THREADS = Runtime.getRuntime().availableProcessors();
 
-    public static <T extends Number> T parallelReduceList(List<T> list, MathOperation<T> operation)  {
+    public static <T extends Number> T parallelReduceList(List<T> list, MathOperation<T> operation) {
         if (list.isEmpty()) {
             throw new IllegalArgumentException("List cannot be empty");
         }
@@ -26,23 +27,19 @@ public class ParallelCalculator {
         List<T> results;
 
         try (ExecutorService executor = Executors.newFixedThreadPool(MAX_THREADS)) {
-            List<Future<T>> futures = chunks
-                .stream()
-                .map(chunk -> executor.submit(new ReducingCallable<>(chunk, operation)))
-                .toList();
-
-            results = futures.stream()
-                             .map(future -> {
-                                 try {
-                                     return future.get();
-                                 } catch (InterruptedException | ExecutionException e) {
-                                     throw new RuntimeException(
-                                         "Error during parallel reduction",
-                                         e
-                                     );
-                                 }
-                             })
-                             .toList();
+            results = chunks.stream()
+                            .map(chunk -> executor.submit(new ReducingCallable<>(chunk, operation)))
+                            .map(future -> {
+                                try {
+                                    return future.get();
+                                } catch (InterruptedException | ExecutionException e) {
+                                    throw new RuntimeException(
+                                        "Error during parallel reduction",
+                                        e
+                                    );
+                                }
+                            })
+                            .toList();
         }
 
         return reduceList(results, operation);

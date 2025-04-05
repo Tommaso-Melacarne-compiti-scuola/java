@@ -1,13 +1,17 @@
 package online.polp;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static online.polp.utils.ListUtils.chunkList;
 
 public class ParallelCalculator {
-    static final int MAX_THREADS = Runtime.getRuntime().availableProcessors();
+    public static final int MAX_THREADS = Runtime.getRuntime().availableProcessors();
 
-    public static <T extends Number> T parallelReduceList(List<T> list, MathOperation<T> operation) {
+    public static <T extends Number> T parallelReduceList(List<T> list, MathOperation<T> operation)  {
         if (list.isEmpty()) {
             throw new IllegalArgumentException("List cannot be empty");
         }
@@ -19,34 +23,27 @@ public class ParallelCalculator {
         int chunkSize = Math.max(1, list.size() / MAX_THREADS);
         List<List<T>> chunks = chunkList(list, chunkSize);
 
-        List<ReducingRunnable<T>> reducingRunnables = chunks
-            .stream()
-            .map(chunk -> new ReducingRunnable<>(chunk, operation))
-            .toList();
+        List<T> results;
 
-        List<Thread> threads = reducingRunnables
-            .stream()
-            .map(Thread::new)
-            .toList();
+        try (ExecutorService executor = Executors.newFixedThreadPool(MAX_THREADS)) {
+            List<Future<T>> futures = chunks
+                .stream()
+                .map(chunk -> executor.submit(new ReducingCallable<>(chunk, operation)))
+                .toList();
 
-
-        System.out.println("Starting " + threads.size() + " threads for parallel reduction.");
-        for (Thread thread : threads) {
-            thread.start();
+            results = futures.stream()
+                             .map(future -> {
+                                 try {
+                                     return future.get();
+                                 } catch (InterruptedException | ExecutionException e) {
+                                     throw new RuntimeException(
+                                         "Error during parallel reduction",
+                                         e
+                                     );
+                                 }
+                             })
+                             .toList();
         }
-
-        for (Thread thread : threads) {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                throw new RuntimeException("Thread interrupted", e);
-            }
-        }
-
-        List<T> results = reducingRunnables.stream()
-                                           .map(ReducingRunnable::getResult)
-                                           .toList();
 
         return reduceList(results, operation);
     }

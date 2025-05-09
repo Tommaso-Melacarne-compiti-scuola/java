@@ -68,4 +68,10 @@ public class Board {
             addRandomShip(shipLength);
         }
     }
+
+    public void addShips(List<Ship> ships) throws ShipAddException {
+        for (Ship ship : ships) {
+            addShip(ship);
+        }
+    }
 }

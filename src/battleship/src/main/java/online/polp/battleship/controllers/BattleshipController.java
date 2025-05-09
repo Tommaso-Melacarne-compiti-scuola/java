@@ -1,12 +1,12 @@
 package online.polp.battleship.controllers;
 
 import jakarta.annotation.PostConstruct;
-import online.polp.battleship.controllers.pojos.NewGameResponse;
+import online.polp.battleship.controllers.pojos.NewGameRequest;
+import online.polp.battleship.controllers.pojos.GetGridsResponse;
+import online.polp.battleship.exceptions.ShipAddException;
 import online.polp.battleship.model.BattleshipModel;
 import online.polp.battleship.model.Player;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -15,30 +15,47 @@ import java.util.List;
 class BattleshipController {
     @PostConstruct
     public void onStartup() {
-        Player humanPlayer = new Player("Human");
         Player pcPlayer = new Player("PC");
-
-        // TODO: Allow human player to add ships to the board
-        humanPlayer.getBoard().addRandomShips();
 
         pcPlayer.getBoard().addRandomShips();
 
-        List<Player> players = List.of(humanPlayer, pcPlayer);
+        BattleshipModel.addPlayer(pcPlayer);
+    }
 
-        for (Player player : players) {
-            BattleshipModel.addPlayer(player);
+    /**
+     * Get Grids
+     *
+     * @return The current game grids
+     */
+    @GetMapping("/get-grids")
+    public GetGridsResponse getGrids() {
+        List<Player> players = BattleshipModel.getPlayers();
+
+        return new GetGridsResponse(players);
+    }
+
+    /**
+     * New Game
+     *
+     * Creates a new game with the given player ships.
+     *
+     * @param newGameRequest A request optionally indicating player's ships
+     * @return The grid of the new game
+     */
+    @PostMapping("/new-game")
+    public GetGridsResponse getNewGame(@RequestBody(required = false) NewGameRequest newGameRequest) throws ShipAddException {
+        Player humanPlayer = new Player("Human");
+
+        if (newGameRequest == null) {
+            humanPlayer.getBoard().addRandomShips();
+        } else {
+            humanPlayer.getBoard().addShips(newGameRequest.getShips());
         }
-    }
 
-    @GetMapping("/")
-    public String index() {
-        return "Greetings from Battleship!";
-    }
+        BattleshipModel.addPlayer(humanPlayer);
 
-    @GetMapping("/new-game")
-    public NewGameResponse getNewGame() {
-        List<Player> players =  BattleshipModel.getPlayers();
+        List<Player> players = BattleshipModel.getPlayers();
 
-        return new NewGameResponse(players);
+        return new GetGridsResponse(players);
     }
 }

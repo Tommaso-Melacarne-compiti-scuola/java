@@ -7,13 +7,13 @@ import online.polp.battleship.model.Player;
 import java.util.List;
 
 @Data
-public class NewGameResponse {
+public class GetGridsResponse {
     private final List<Integer> player;
     private final List<Integer> computer;
 
-    public NewGameResponse(List<Player> players) {
-        this.player = fromBoardToList(players.get(0));
-        this.computer = fromBoardToList(players.get(1));
+    public GetGridsResponse(List<Player> players) {
+        this.computer = fromBoardToList(players.get(0));
+        this.player = fromBoardToList(players.get(1));
     }
 
     private List<Integer> fromBoardToList(Player player) {

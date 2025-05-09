@@ -11,9 +11,9 @@ public class GetGridsResponse {
     private final List<Integer> player;
     private final List<Integer> computer;
 
-    public GetGridsResponse(List<Player> players) {
-        this.computer = fromBoardToList(players.get(0));
-        this.player = fromBoardToList(players.get(1));
+    public GetGridsResponse(Player player, Player computer) {
+        this.player = fromBoardToList(player);
+        this.computer = fromBoardToList(computer);
     }
 
     private List<Integer> fromBoardToList(Player player) {

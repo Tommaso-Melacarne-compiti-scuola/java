@@ -10,7 +10,7 @@ public class Hit extends Point {
     @NonNull
     private AttackResult result;
 
-    public Hit(AttackResult result, Point point) {
+    public Hit(@NonNull AttackResult result, Point point) {
         super(point);
         this.result = result;
     }

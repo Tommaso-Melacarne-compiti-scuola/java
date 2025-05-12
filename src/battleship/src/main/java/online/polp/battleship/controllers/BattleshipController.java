@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:63342") // Allow requests from any origin
+@CrossOrigin(origins = "http://localhost:63342")
 class BattleshipController {
     @PostConstruct
     public void onStartup() {

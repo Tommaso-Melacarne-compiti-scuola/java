@@ -13,7 +13,7 @@ public class Ship {
     private final Orientation orientation;
 
     public boolean isHit(Point point) {
-        Point end = position.extendInDirection(orientation, length - 1);
+        Point end = position.translateInDirection(orientation, length - 1);
 
         return point.isInsideRectangle(position, end);
     }
@@ -23,21 +23,31 @@ public class Ship {
             return false;
         }
 
-        Point end = position.extendInDirection(orientation, length - 1);
+        Point end = position.translateInDirection(orientation, length - 1);
 
         return end.isInsideBoard(boardSize, boardSize);
     }
 
     public boolean isSunk(List<Hit> hits) {
-        for (int i = 0; i < length; i++) {
-            Point point = position.extendInDirection(orientation, i);
+        List<Point> shipPoints = getPoints();
 
-            if (hits.stream().noneMatch(hit -> hit.equals(point))) {
-                return false;
+        for (Point point : shipPoints) {
+            boolean pointIsHit = false;
+
+            for (Hit hit : hits) {
+                // Compare coordinates directly since Hit extends Point
+                if (hit.getX().equals(point.getX()) && hit.getY().equals(point.getY())) {
+                    pointIsHit = true;
+                    break;
+                }
+            }
+
+            if (!pointIsHit) {
+                return false; // Found a point that hasn't been hit
             }
         }
 
-        return true;
+        return true; // All points have been hit
     }
 
     /**
@@ -47,10 +57,15 @@ public class Ship {
      * @return true if the ships collide, false otherwise
      */
     public boolean collidesWith(Ship other) {
-        Point end = position.extendInDirection(orientation, length - 1);
+        Point end = position.translateInDirection(orientation, length - 1);
 
-        return position.isInsideRectangle(other.position, other.position.extendInDirection(other.orientation, other.length - 1)) ||
-               other.position.isInsideRectangle(position, end);
+        return position.isInsideRectangle(other.position,
+                                          other.position.translateInDirection(
+                                              other.orientation,
+                                              other.length - 1
+                                          )
+        ) ||
+            other.position.isInsideRectangle(position, end);
     }
 
     public List<Point> getPoints() {

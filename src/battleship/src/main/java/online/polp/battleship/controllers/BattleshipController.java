@@ -1,14 +1,16 @@
 package online.polp.battleship.controllers;
 
 import jakarta.annotation.PostConstruct;
+import online.polp.battleship.constants.BoardConstants;
+import online.polp.battleship.controllers.pojos.AttackResponse;
 import online.polp.battleship.controllers.pojos.GetGridsResponse;
 import online.polp.battleship.controllers.pojos.NewGameRequest;
 import online.polp.battleship.exceptions.ShipAddException;
+import online.polp.battleship.model.AttackResult;
 import online.polp.battleship.model.BattleshipModel;
 import online.polp.battleship.model.Player;
+import online.polp.battleship.model.Point;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:63342")
@@ -43,7 +45,7 @@ class BattleshipController {
      * @return The grid of the new game
      */
     @PostMapping("/new-game")
-    public GetGridsResponse getNewGame(@RequestBody(required = false) NewGameRequest newGameRequest) throws ShipAddException {
+    public GetGridsResponse startNewGame(@RequestBody(required = false) NewGameRequest newGameRequest) throws ShipAddException {
         Player humanPlayer = new Player("Player");
 
         if (newGameRequest == null) {
@@ -61,6 +63,18 @@ class BattleshipController {
     }
 
     @PutMapping("/attack/{index}")
-    public void attack(@PathVariable int index) {
+    public AttackResponse attack(@PathVariable int index) {
+        AttackResult playerAttackResult = BattleshipModel
+            .getComputer()
+            .getBoard()
+            .attack(Point.fromIndex(index, BoardConstants.BOARD_SIZE));
+        AttackResult computerAttackResult = BattleshipModel.getPlayer().getBoard().attack(
+            Point.randomPoint(BoardConstants.BOARD_SIZE)
+        );
+
+        return new AttackResponse(
+            playerAttackResult,
+            computerAttackResult
+        );
     }
 }

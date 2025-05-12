@@ -45,14 +45,14 @@ public class Point {
         return x >= 0 && x < width && y >= 0 && y < height;
     }
 
-    public Point extendInDirection(Orientation orientation, int length) {
-        return extend(
+    public Point translateInDirection(Orientation orientation, int length) {
+        return translate(
             orientation == Orientation.HORIZONTAL ? length : 0,
             orientation == Orientation.VERTICAL ? length : 0
         );
     }
 
-    public Point extend(int dx, int dy) {
+    public Point translate(int dx, int dy) {
         return new Point(x + dx, y + dy);
     }
 
@@ -74,9 +74,13 @@ public class Point {
         List<Point> points = new ArrayList<>(length);
 
         for (int i = 0; i < length; i++) {
-            points.add(extendInDirection(orientation, i));
+            points.add(translateInDirection(orientation, i));
         }
 
         return points;
+    }
+
+    public static Point fromIndex(int index, int boardWidth) {
+        return new Point(index % boardWidth, index / boardWidth);
     }
 }

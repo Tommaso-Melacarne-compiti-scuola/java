@@ -26,17 +26,24 @@ public class Board {
         ships.add(ship);
     }
 
+    /**
+     * Attacks this player's board at the given point
+     *
+     * @param point The point to attack
+     * @return The result of the attack
+     */
     public AttackResult attack(Point point) {
         for (Ship ship : ships) {
             if (ship.isHit(point)) {
-                AttackResult result = AttackResult.HIT;
+                Hit hit = new Hit(AttackResult.HIT, point);
+
+                hits.add(hit);
 
                 if (ship.isSunk(hits)) {
-                    return AttackResult.SUNK;
+                    hit.setResult(AttackResult.SUNK);
                 }
 
-                hits.add(new Hit(result, point));
-                return result;
+                return hit.getResult();
             }
         }
 

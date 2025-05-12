@@ -31,12 +31,15 @@ function getComputerEventListener(cell, cellIndex) {
 
       const result = await response.json();
 
-      if (result.hit) {
+      if (result["playerAttackResult"] === "HIT") {
         alert("Hit!");
         cell.style.backgroundColor = "red";
-      } else {
+      } else if (result["playerAttackResult"] === "MISS") {
         alert("Miss!");
         cell.style.backgroundColor = "lightgrey";
+      } else if (result["playerAttackResult"] === "SUNK") {
+        alert("Sunk!");
+        cell.style.backgroundColor = "darkred";
       }
     } catch (error) {
       console.error("Error attacking:", error);
@@ -66,8 +69,12 @@ function displayShips(gridElement, shipIndices) {
   });
 }
 
-document.getElementById("start-game-btn").addEventListener("click", () => {
-  fetch(`${baseUrl}/new-game`, {
+const startGameBtn = document.getElementById("start-game-btn");
+
+startGameBtn.addEventListener("click", async () => {
+  startGameBtn.disabled = true;
+
+  await fetch(`${baseUrl}/new-game`, {
     method: "POST",
   })
     .then((response) => {
@@ -80,8 +87,12 @@ document.getElementById("start-game-btn").addEventListener("click", () => {
       // data = { player: [1, 23, 45], computer: [10, 20, 30] }
       displayShips(playerGrid, data.player);
       displayShips(computerGrid, data.computer);
+
+      startGameBtn.classList.add("d-none");
     })
     .catch((error) => {
       console.error("Error loading grids:", error);
+      alert("Error loading grids!");
+      startGameBtn.disabled = false;
     });
 });

@@ -2,6 +2,7 @@ package online.polp.battleship.model;
 
 import lombok.Builder;
 import lombok.Data;
+import online.polp.battleship.utils.Utils;
 
 import java.util.List;
 
@@ -11,6 +12,7 @@ public class Ship {
     private final Point position;
     private final int length;
     private final Orientation orientation;
+    private final String color = Utils.getRandomHexColor();
 
     public boolean isHit(Point point) {
         Point end = position.translateInDirection(orientation, length - 1);

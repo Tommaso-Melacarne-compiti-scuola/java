@@ -3,7 +3,6 @@ package online.polp.battleship.controllers;
 import jakarta.annotation.PostConstruct;
 import online.polp.battleship.constants.BoardConstants;
 import online.polp.battleship.controllers.pojos.AttackResponse;
-import online.polp.battleship.controllers.pojos.Grids;
 import online.polp.battleship.controllers.pojos.NewGameRequest;
 import online.polp.battleship.controllers.pojos.GameUpdate;
 import online.polp.battleship.exceptions.ShipAddException;
@@ -26,13 +25,13 @@ class BattleshipController {
     }
 
     /**
-     * Get Grids
+     * Get Update
      *
-     * @return The current game grids
+     * @return The current game status
      */
-    @GetMapping("/get-grids")
-    public Grids getGrids() {
-        return new Grids(
+    @GetMapping("/get-update")
+    public GameUpdate getUpdate() {
+        return new GameUpdate(
             BattleshipModel.getPlayer(),
             BattleshipModel.getComputer()
         );
@@ -57,10 +56,10 @@ class BattleshipController {
 
         BattleshipModel.setPlayer(humanPlayer);
 
-        return new GameUpdate(new Grids(
+        return new GameUpdate(
             BattleshipModel.getPlayer(),
             BattleshipModel.getComputer()
-        ));
+        );
     }
 
     @PutMapping("/attack/{index}")
@@ -76,7 +75,7 @@ class BattleshipController {
         return new AttackResponse(
             playerAttackResult,
             computerAttackResult,
-            new Grids(
+            new GameUpdate(
                 BattleshipModel.getPlayer(),
                 BattleshipModel.getComputer()
             )

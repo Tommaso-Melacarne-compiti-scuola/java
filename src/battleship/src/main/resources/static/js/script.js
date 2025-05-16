@@ -1,6 +1,33 @@
 const baseUrl = "http://localhost:3000";
 const GRID_SIZE = 10;
 
+/**
+ * @typedef {Object} Point
+ * @property x
+ * @property y
+ */
+
+/**
+ * @typedef {Object} Ship
+ * @property {Point[]} points The points occupied by the ship.
+ */
+
+/**
+ * @typedef {"HIT" | "MISS" | "SUNK"} AttackResult
+ */
+
+/**
+ * @typedef {Object} Hit
+ * @extends Point
+ * @property {string} result - The result of the attack (e.g., "HIT", "MISS", "SUNK").
+ */
+
+/**
+ * @typedef {Object} GameUpdate
+ * @property {Ship[]} playerShips - The player's ships.
+ * @property {Hit[]} playerHits - The player's hits.
+ * @property {Hit[]} computerHits - The computer's hits.
+ */
 
 /**
  * Creates an empty grid of cells within the given container.
@@ -13,19 +40,20 @@ function createEmptyGrid(container, isComputerGrid) {
         cell.classList.add("cell");
 
         if (isComputerGrid) {
-            cell.addEventListener("click", getComputerEventListener(cell, i));
+            cell.addEventListener("click", getAttackEventListener(cell, i));
         }
 
         container.appendChild(cell);
     }
 }
 
-function getComputerEventListener(cell, cellIndex) {
+function getAttackEventListener(cell, cellIndex) {
     return async () => {
         try {
             const response = await fetch(`${baseUrl}/attack/${cellIndex}`, {
                 method: "PUT",
             });
+
 
             if (!response.ok) {
                 throw new Error("Network response was not ok");
@@ -33,16 +61,15 @@ function getComputerEventListener(cell, cellIndex) {
 
             const result = await response.json();
 
+            processUpdate(result.gameUpdate);
+
             if (result["playerAttackResult"] === "HIT") {
                 alert("Hit!");
-                cell.style.backgroundColor = "red";
                 cell.disabled = true;
             } else if (result["playerAttackResult"] === "MISS") {
                 alert("Miss!");
-                cell.style.backgroundColor = "lightgrey";
             } else if (result["playerAttackResult"] === "SUNK") {
                 alert("Sunk!");
-                cell.style.backgroundColor = "darkred";
             }
         } catch (error) {
             console.error("Error attacking:", error);
@@ -56,18 +83,6 @@ const computerGrid = document.getElementById("computer-grid");
 
 createEmptyGrid(playerGrid, false);
 createEmptyGrid(computerGrid, true);
-
-/**
- * @typedef {Object} Point
- * @property x
- * @property y
- */
-
-/**
- * @typedef {Object} Ship
- * @property {Point[]} points The points occupied by the ship.
- */
-
 
 /**
  * Adds the 'ship' class to cells in a grid based on an array of indices.
@@ -103,8 +118,7 @@ startGameBtn.addEventListener("click", async () => {
             return response.json();
         })
         .then((data) => {
-            displayShips(playerGrid, data.grids.player);
-            displayShips(computerGrid, data.grids.computer);
+            processUpdate(data);
 
             startGameBtn.classList.add("d-none");
         })
@@ -114,3 +128,37 @@ startGameBtn.addEventListener("click", async () => {
             startGameBtn.disabled = false;
         });
 });
+
+/**
+ * Processes the game update and updates the UI accordingly.
+ *
+ * @param {GameUpdate} gameUpdate - The game update object containing player ships and hits.
+ */
+function processUpdate(gameUpdate) {
+    displayShips(playerGrid, gameUpdate.playerShips);
+    displayHits(computerGrid, gameUpdate.computerHits);
+    displayHits(playerGrid, gameUpdate.playerHits);
+}
+
+/**
+ * Processes the hits and updates the Grids accordingly.
+ * @param {HTMLElement} gridElement - The grid element.
+ * @param hits - An array of hit objects containing x, y coordinates and result.
+ */
+function displayHits(gridElement, hits) {
+    const cells = gridElement.querySelectorAll(".cell");
+
+    for (const hit of hits) {
+        const index = hit.x + GRID_SIZE * hit.y;
+
+        if (cells[index]) {
+            if (hit.result === "HIT") {
+                cells[index].style.backgroundColor = "red";
+            } else if (hit.result === "MISS") {
+                cells[index].style.backgroundColor = "lightgrey";
+            } else if (hit.result === "SUNK") {
+                cells[index].style.backgroundColor = "darkred";
+            }
+        }
+    }
+}

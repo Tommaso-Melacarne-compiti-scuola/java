@@ -33,21 +33,23 @@ public class Board {
      * @return The result of the attack
      */
     public AttackResult attack(Point point) {
+        Hit hit = new Hit(AttackResult.MISS, point);
+
         for (Ship ship : ships) {
             if (ship.isHit(point)) {
-                Hit hit = new Hit(AttackResult.HIT, point);
-
-                hits.add(hit);
+                hit.setResult(AttackResult.HIT);
 
                 if (ship.isSunk(hits)) {
                     hit.setResult(AttackResult.SUNK);
                 }
 
+                hits.add(hit);
                 return hit.getResult();
             }
         }
 
-        return AttackResult.MISS;
+        hits.add(hit);
+        return hit.getResult();
     }
 
     public void addRandomShip(int length) {

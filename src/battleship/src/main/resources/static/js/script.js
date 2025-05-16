@@ -36,6 +36,7 @@ function getComputerEventListener(cell, cellIndex) {
             if (result["playerAttackResult"] === "HIT") {
                 alert("Hit!");
                 cell.style.backgroundColor = "red";
+                cell.disabled = true;
             } else if (result["playerAttackResult"] === "MISS") {
                 alert("Miss!");
                 cell.style.backgroundColor = "lightgrey";
@@ -78,7 +79,7 @@ function displayShips(gridElement, ships) {
 
     for (const ship of ships) {
         for (const point of ship.points) {
-            const index = point.x * GRID_SIZE + point.y;
+            const index = point.x + GRID_SIZE * point.y;
 
             if (cells[index]) {
                 cells[index].classList.add("ship");
@@ -102,8 +103,8 @@ startGameBtn.addEventListener("click", async () => {
             return response.json();
         })
         .then((data) => {
-            displayShips(playerGrid, data.player);
-            displayShips(computerGrid, data.computer);
+            displayShips(playerGrid, data.grids.player);
+            displayShips(computerGrid, data.grids.computer);
 
             startGameBtn.classList.add("d-none");
         })

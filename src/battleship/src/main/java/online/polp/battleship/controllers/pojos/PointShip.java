@@ -11,6 +11,6 @@ public class PointShip {
     private final List<Point> points;
 
     public PointShip(Ship ship) {
-        this.points = ship.getPoints();
+        this.points = ship.computePoints();
     }
 }

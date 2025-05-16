@@ -7,4 +7,6 @@ import online.polp.battleship.model.AttackResult;
 public class AttackResponse {
     private final AttackResult playerAttackResult;
     private final AttackResult computerAttackResult;
+
+    private final Grids newGrids;
 }

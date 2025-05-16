@@ -3,8 +3,9 @@ package online.polp.battleship.controllers;
 import jakarta.annotation.PostConstruct;
 import online.polp.battleship.constants.BoardConstants;
 import online.polp.battleship.controllers.pojos.AttackResponse;
-import online.polp.battleship.controllers.pojos.GetGridsResponse;
+import online.polp.battleship.controllers.pojos.Grids;
 import online.polp.battleship.controllers.pojos.NewGameRequest;
+import online.polp.battleship.controllers.pojos.GameUpdate;
 import online.polp.battleship.exceptions.ShipAddException;
 import online.polp.battleship.model.AttackResult;
 import online.polp.battleship.model.BattleshipModel;
@@ -30,8 +31,8 @@ class BattleshipController {
      * @return The current game grids
      */
     @GetMapping("/get-grids")
-    public GetGridsResponse getGrids() {
-        return new GetGridsResponse(
+    public Grids getGrids() {
+        return new Grids(
             BattleshipModel.getPlayer(),
             BattleshipModel.getComputer()
         );
@@ -45,7 +46,7 @@ class BattleshipController {
      * @return The grid of the new game
      */
     @PostMapping("/new-game")
-    public GetGridsResponse startNewGame(@RequestBody(required = false) NewGameRequest newGameRequest) throws ShipAddException {
+    public GameUpdate startNewGame(@RequestBody(required = false) NewGameRequest newGameRequest) throws ShipAddException {
         Player humanPlayer = new Player("Player");
 
         if (newGameRequest == null) {
@@ -56,10 +57,10 @@ class BattleshipController {
 
         BattleshipModel.setPlayer(humanPlayer);
 
-        return new GetGridsResponse(
+        return new GameUpdate(new Grids(
             BattleshipModel.getPlayer(),
             BattleshipModel.getComputer()
-        );
+        ));
     }
 
     @PutMapping("/attack/{index}")
@@ -74,7 +75,11 @@ class BattleshipController {
 
         return new AttackResponse(
             playerAttackResult,
-            computerAttackResult
+            computerAttackResult,
+            new Grids(
+                BattleshipModel.getPlayer(),
+                BattleshipModel.getComputer()
+            )
         );
     }
 }

@@ -6,11 +6,11 @@ import online.polp.battleship.model.Player;
 import java.util.List;
 
 @Data
-public class GetGridsResponse {
+public class Grids {
     private final List<PointShip> player;
     private final List<PointShip> computer;
 
-    public GetGridsResponse(Player player, Player computer) {
+    public Grids(Player player, Player computer) {
         this.player = fromBoardToList(player);
         this.computer = fromBoardToList(computer);
     }
@@ -19,7 +19,8 @@ public class GetGridsResponse {
         // Takes ship array and converts it to a PointShip array
         return player.getBoard()
                      .getShips()
-                     .stream().map(PointShip::new)
+                     .stream()
+                     .map(PointShip::new)
                      .toList();
     }
 }

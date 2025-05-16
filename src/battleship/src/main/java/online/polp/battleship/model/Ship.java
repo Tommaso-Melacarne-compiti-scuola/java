@@ -29,7 +29,7 @@ public class Ship {
     }
 
     public boolean isSunk(List<Hit> hits) {
-        List<Point> shipPoints = getPoints();
+        List<Point> shipPoints = computePoints();
 
         for (Point point : shipPoints) {
             boolean pointIsHit = false;
@@ -59,16 +59,17 @@ public class Ship {
     public boolean collidesWith(Ship other) {
         Point end = position.translateInDirection(orientation, length - 1);
 
-        return position.isInsideRectangle(other.position,
-                                          other.position.translateInDirection(
-                                              other.orientation,
-                                              other.length - 1
-                                          )
+        return position.isInsideRectangle(
+            other.position,
+            other.position.translateInDirection(
+                other.orientation,
+                other.length - 1
+            )
         ) ||
             other.position.isInsideRectangle(position, end);
     }
 
-    public List<Point> getPoints() {
+    public List<Point> computePoints() {
         return position.getPointsInDirection(orientation, length);
     }
 }

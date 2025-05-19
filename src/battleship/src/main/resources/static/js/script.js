@@ -1,6 +1,8 @@
 const baseUrl = "http://localhost:3000";
 const GRID_SIZE = 10;
 
+const possibleColors = ['#ed5f55','#f7ac57','#cfed55','#55eda6','#64f0f5','#8164f5','#c564f5','#ff8cd7','#a86f1e']
+
 /**
  * @typedef {Object} Point
  * @property x
@@ -91,13 +93,16 @@ createEmptyGrid(computerGrid, true);
 function displayShips(gridElement, ships) {
   const cells = gridElement.querySelectorAll(".cell");
 
-  for (const ship of ships) {
+  for (let i = 0; i < ships.length; i++){
+    const ship = ships[i];
+    const shipColor = possibleColors[i % possibleColors.length];
+
     for (const point of ship.points) {
       const index = point.x + GRID_SIZE * point.y;
 
       if (cells[index]) {
         cells[index].classList.add("ship");
-        cells[index].style.backgroundColor = ship.color;
+        cells[index].style.backgroundColor = shipColor;
       }
     }
   }

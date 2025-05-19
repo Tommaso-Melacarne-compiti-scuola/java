@@ -15,15 +15,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @CrossOrigin(origins = "http://localhost:63342")
 class BattleshipController {
-    @PostConstruct
-    public void onStartup() {
-        Player computer = new Player("Computer");
-
-        computer.getBoard().addRandomShips();
-
-        BattleshipModel.setComputer(computer);
-    }
-
     /**
      * Get Update
      *
@@ -31,6 +22,21 @@ class BattleshipController {
      */
     @GetMapping("/get-update")
     public GameUpdate getUpdate() {
+        return new GameUpdate(
+            BattleshipModel.getPlayer(),
+            BattleshipModel.getComputer()
+        );
+    }
+
+    @GetMapping("/has-started")
+    public boolean hasStarted() {
+        return BattleshipModel.getPlayer() != null && BattleshipModel.getComputer() != null;
+    }
+
+    @GetMapping("/reset-game")
+    public GameUpdate resetGame() {
+        BattleshipModel.resetGame();
+
         return new GameUpdate(
             BattleshipModel.getPlayer(),
             BattleshipModel.getComputer()
@@ -46,15 +52,16 @@ class BattleshipController {
      */
     @PostMapping("/new-game")
     public GameUpdate startNewGame(@RequestBody(required = false) NewGameRequest newGameRequest) throws ShipAddException {
-        Player humanPlayer = new Player("Player");
+        BattleshipModel.setComputer(new Player("Computer"));
+        BattleshipModel.setPlayer(new Player("Player"));
+
+        BattleshipModel.getComputer().getBoard().addRandomShips();
 
         if (newGameRequest == null) {
-            humanPlayer.getBoard().addRandomShips();
+            BattleshipModel.getPlayer().getBoard().addRandomShips();
         } else {
-            humanPlayer.getBoard().addShips(newGameRequest.getShips());
+            BattleshipModel.getPlayer().getBoard().addShips(newGameRequest.getShips());
         }
-
-        BattleshipModel.setPlayer(humanPlayer);
 
         return new GameUpdate(
             BattleshipModel.getPlayer(),

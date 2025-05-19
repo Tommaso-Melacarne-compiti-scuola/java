@@ -158,11 +158,11 @@ function displayHits(gridElement, hits) {
 
     if (cells[index]) {
       if (hit.result === "HIT") {
-        cells[index].style.backgroundColor = "red";
+        cells[index].classList.add("hit");
       } else if (hit.result === "MISS") {
-        cells[index].style.backgroundColor = "lightgrey";
+        cells[index].classList.add("miss");
       } else if (hit.result === "SUNK") {
-        cells[index].style.backgroundColor = "darkred";
+        cells[index].classList.add("sunk");
       }
     }
   }

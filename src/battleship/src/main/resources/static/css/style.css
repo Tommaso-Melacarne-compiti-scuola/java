@@ -53,7 +53,7 @@
 }
 
 .miss {
-  background-image: url("../images/water.png");
+  background-image: url("../images/water.webp");
 }
 
 .hit,
@@ -63,22 +63,22 @@
 
 @keyframes explosion-animation {
   0% {
-    background-image: url("../images/explosions/exp1.png");
+    background-image: url("../images/explosions/exp1.webp");
   }
   20% {
-    background-image: url("../images/explosions/exp2.png");
+    background-image: url("../images/explosions/exp2.webp");
   }
   40% {
-    background-image: url("../images/explosions/exp3.png");
+    background-image: url("../images/explosions/exp3.webp");
   }
   60% {
-    background-image: url("../images/explosions/exp4.png");
+    background-image: url("../images/explosions/exp4.webp");
   }
   80% {
-    background-image: url("../images/explosions/exp5.png");
+    background-image: url("../images/explosions/exp5.webp");
   }
   100% {
-    background-image: url("../images/explosions/exp6.png");
+    background-image: url("../images/explosions/exp6.webp");
   }
 }
 

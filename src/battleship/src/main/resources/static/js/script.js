@@ -448,9 +448,19 @@ function startGame(data) {
  * @param {GameUpdate} gameUpdate - The game update object containing player ships and hits.
  */
 function processUpdate(gameUpdate) {
-  displayShips(playerGrid, gameUpdate.playerShips);
-  displayHits(computerGrid, gameUpdate.computerHits);
-  displayHits(playerGrid, gameUpdate.playerHits);
+  try {
+    displayShips(playerGrid, gameUpdate.playerShips);
+    displayHits(computerGrid, gameUpdate.computerHits);
+    displayHits(playerGrid, gameUpdate.playerHits);
+
+    // Check for game over after each update
+    if (isGameOver(gameUpdate)) {
+      console.log("Game over detected in processUpdate");
+      handleGameOver(gameUpdate);
+    }
+  } catch (error) {
+    console.error("Error in processUpdate:", error);
+  }
 }
 
 /**
@@ -565,6 +575,16 @@ resetGameBtn.addEventListener("click", async () => {
  * @returns {Promise<void>}
  */
 async function attack(cell, cellIndex) {
+  // Don't allow attacks if the cell is already hit or game is over
+  if (
+    cell.classList.contains("hit") ||
+    cell.classList.contains("miss") ||
+    cell.classList.contains("sunk") ||
+    cell.style.pointerEvents === "none"
+  ) {
+    return;
+  }
+
   try {
     const response = await fetch(`${baseUrl}/attack/${cellIndex}`, {
       method: "PUT",
@@ -576,12 +596,14 @@ async function attack(cell, cellIndex) {
 
     const result = await response.json();
 
+    // Process the game update first to update the UI
     processUpdate(result["gameUpdate"]);
 
     const playerHit = result["playerHit"];
     const computerHit = result["computerHit"];
     const currentTurn = result["currentTurn"];
 
+    // Add log entries
     addElementToLog(
       currentTurn,
       "Player",
@@ -603,62 +625,232 @@ async function attack(cell, cellIndex) {
 }
 
 /**
- * Checks if the game is over by checking if all ships are sunk.
+ * Checks if the game is over by checking if all ships of either player are sunk.
  * @param {GameUpdate} gameUpdate - The current game state.
  * @returns {boolean} True if the game is over.
  */
-function checkGameOver(gameUpdate) {
-  // Count how many ships have been sunk
-  const playerShipsSunk = gameUpdate.playerShips.filter((ship) =>
-    ship.points.every((point) => {
-      const isHit = gameUpdate.playerHits.some(
+function isGameOver(gameUpdate) {
+  try {
+    // For playerShips, we check if they're hit by computerHits
+    const playerShipsSunk = countSunkShips(
+      gameUpdate.playerShips,
+      gameUpdate.playerHits,
+    );
+
+    // For computer ships, we need to count how many distinct ships have been sunk
+    // by checking the "SUNK" results in computerHits
+    const computerSunkCount = gameUpdate.computerHits.filter(
+      (hit) => hit.result === "SUNK",
+    ).length;
+
+    // Debug information
+    console.log(
+      `Player ships sunk: ${playerShipsSunk}, Computer ships sunk: ${computerSunkCount}`,
+    );
+    console.log(`Total ships to sink: ${SHIP_CONFIGS.length}`);
+
+    // Game is over if all ships of either player are sunk
+    return (
+      playerShipsSunk >= SHIP_CONFIGS.length ||
+      computerSunkCount >= SHIP_CONFIGS.length
+    );
+  } catch (error) {
+    console.error("Error in isGameOver:", error);
+    return false;
+  }
+}
+
+/**
+ * Counts how many ships are sunk for a player
+ * @param {Ship[]} ships - The ships to check
+ * @param {Hit[]} hits - The hits to check against
+ * @returns {number} - The number of sunk ships
+ */
+function countSunkShips(ships, hits) {
+  try {
+    let sunkCount = 0;
+
+    // Check each ship
+    for (const ship of ships) {
+      if (isShipSunk(ship, hits)) {
+        sunkCount++;
+      }
+    }
+
+    return sunkCount;
+  } catch (error) {
+    console.error("Error in countSunkShips:", error);
+    return 0;
+  }
+}
+
+/**
+ * Checks if a specific ship is sunk
+ * @param {Ship} ship - The ship to check
+ * @param {Hit[]} hits - The hits to check against
+ * @returns {boolean} - Whether the ship is sunk
+ */
+function isShipSunk(ship, hits) {
+  try {
+    // A ship is sunk if all of its points have been hit
+    for (const point of ship.points) {
+      // Check if this point has been hit
+      const isPointHit = hits.some(
         (hit) =>
           hit.x === point.x &&
           hit.y === point.y &&
           (hit.result === "HIT" || hit.result === "SUNK"),
       );
-      return isHit;
-    }),
-  ).length;
 
-  const computerShipsSunk = gameUpdate.computerHits.filter(
-    (hit) => hit.result === "SUNK",
-  ).length;
+      // If any point hasn't been hit, the ship isn't sunk
+      if (!isPointHit) {
+        return false;
+      }
+    }
 
-  // Game is over if all ships of either player are sunk
-  return (
-    playerShipsSunk === SHIP_CONFIGS.length ||
-    computerShipsSunk === SHIP_CONFIGS.length
-  );
+    // All points have been hit, so the ship is sunk
+    return true;
+  } catch (error) {
+    console.error("Error in isShipSunk:", error);
+    return false;
+  }
 }
 
 /**
  * Handles the end of the game.
+ * @param {GameUpdate} gameUpdate - The current game state.
  */
-function handleGameOver() {
-  // Disable all cells
-  computerGrid.querySelectorAll(".cell").forEach((cell) => {
-    cell.style.pointerEvents = "none";
-  });
+function handleGameOver(gameUpdate) {
+  try {
+    console.log("Game over detected!");
 
-  // Show game over message
-  setTimeout(() => {
-    const winner = determineWinner();
-    alert(`Game Over! ${winner} wins!`);
-  }, 500);
+    // Disable all cells to prevent further attacks
+    computerGrid.querySelectorAll(".cell").forEach((cell) => {
+      cell.style.pointerEvents = "none";
+    });
+
+    // Determine the winner
+    const winner = determineWinner(gameUpdate);
+    console.log(`Winner determined: ${winner}`);
+
+    // Show the winner modal
+    showWinnerModal(winner);
+  } catch (error) {
+    console.error("Error in handleGameOver:", error);
+    alert("Game over!");
+  }
 }
 
 /**
  * Determines the winner of the game.
+ * @param {GameUpdate} gameUpdate - The current game state.
  * @returns {string} The name of the winner.
  */
-function determineWinner() {
-  const playerHits = document.querySelectorAll(
-    "#player-grid .hit, #player-grid .sunk",
-  ).length;
-  const computerHits = document.querySelectorAll(
-    "#computer-grid .hit, #computer-grid .sunk",
-  ).length;
+function determineWinner(gameUpdate) {
+  try {
+    // For playerShips, we check if they're hit by computerHits
+    const playerShipsSunk = countSunkShips(
+      gameUpdate.playerShips,
+      gameUpdate.playerHits,
+    );
 
-  return playerHits > computerHits ? "Computer" : "Player";
+    // For computer ships, we count SUNK results in computerHits
+    const computerSunkCount = gameUpdate.computerHits.filter(
+      (hit) => hit.result === "SUNK",
+    ).length;
+
+    console.log(
+      `Determining winner - Player ships sunk: ${playerShipsSunk}, Computer ships sunk: ${computerSunkCount}`,
+    );
+
+    // The player who does NOT have all their ships sunk is the winner
+    // or the player who sunk all opponent ships is the winner
+    if (computerSunkCount >= SHIP_CONFIGS.length) {
+      return "Player";
+    } else {
+      return "Computer";
+    }
+  } catch (error) {
+    console.error("Error in determineWinner:", error);
+    return "Unknown";
+  }
+}
+
+/**
+ * Shows the winner modal.
+ * @param {string} winner - The name of the winner.
+ */
+function showWinnerModal(winner) {
+  try {
+    // Make sure the modal element exists
+    const modalElement = document.getElementById("winnerModal");
+    if (!modalElement) {
+      console.error("Modal element not found!");
+      alert(`Game Over! ${winner} wins!`);
+      return;
+    }
+
+    // Update modal content
+    const winnerName = document.getElementById("winner-name");
+    const winnerMessage = document.getElementById("winner-message");
+    const winnerIcon = document.getElementById("winner-icon");
+
+    // Set winner name
+    if (winnerName) {
+      winnerName.textContent = winner;
+
+      // Apply different color based on who won
+      if (winner === "Player") {
+        winnerName.style.color = "#ffc107"; // gold for player
+      } else {
+        winnerName.style.color = "#dc3545"; // red for computer
+      }
+    }
+
+    // Set winner message
+    if (winnerMessage) {
+      winnerMessage.textContent = `wins the battle!`;
+    }
+
+    // Set appropriate icon
+    if (winnerIcon) {
+      if (winner === "Player") {
+        winnerIcon.innerHTML = '<i class="bi bi-trophy text-warning"></i>';
+      } else {
+        winnerIcon.innerHTML = '<i class="bi bi-robot text-danger"></i>';
+      }
+    }
+
+    // Set up play again button
+    const playAgainBtn = document.getElementById("play-again-btn");
+    if (playAgainBtn) {
+      // Remove any existing event listeners
+      const newPlayAgainBtn = playAgainBtn.cloneNode(true);
+      playAgainBtn.parentNode.replaceChild(newPlayAgainBtn, playAgainBtn);
+
+      // Add the click event listener
+      newPlayAgainBtn.addEventListener("click", () => {
+        // Hide modal before resetting
+        const bootstrapModal = bootstrap.Modal.getInstance(modalElement);
+        if (bootstrapModal) {
+          bootstrapModal.hide();
+        }
+
+        // Reset the game
+        resetGameBtn.click();
+      });
+    }
+
+    // Show the modal using Bootstrap
+    try {
+      const winnerModal = new bootstrap.Modal(modalElement);
+      winnerModal.show();
+    } catch (modalError) {
+      console.error("Error showing modal:", modalError);
+      alert(`Game Over! ${winner} wins!`);
+    }
+  } catch (error) {
+    console.error("Error in showWinnerModal:", error);
+    alert(`Game Over! ${winner} wins!`);
+  }
 }

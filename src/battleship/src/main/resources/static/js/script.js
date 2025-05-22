@@ -1,7 +1,17 @@
 const baseUrl = "http://localhost:3000";
 const GRID_SIZE = 10;
 
-const possibleColors = ['#ed5f55','#f7ac57','#cfed55','#55eda6','#64f0f5','#8164f5','#c564f5','#ff8cd7','#a86f1e']
+const possibleColors = [
+  "#ed5f55",
+  "#f7ac57",
+  "#cfed55",
+  "#55eda6",
+  "#64f0f5",
+  "#8164f5",
+  "#c564f5",
+  "#ff8cd7",
+  "#a86f1e",
+];
 
 /**
  * @typedef {Object} Point
@@ -63,15 +73,23 @@ function getAttackEventListener(cell, cellIndex) {
 
       const result = await response.json();
 
-      processUpdate(result.gameUpdate);
+      processUpdate(result["gameUpdate"]);
 
-      if (result["playerAttackResult"] === "HIT") {
-        alert("Hit!");
-      } else if (result["playerAttackResult"] === "MISS") {
-        alert("Miss!");
-      } else if (result["playerAttackResult"] === "SUNK") {
-        alert("Sunk!");
-      }
+      const playerHit = result["playerHit"];
+      const computerHit = result["computerHit"];
+
+      addElementToLog(
+        "Player",
+        playerHit["x"],
+        playerHit["y"],
+        playerHit["result"],
+      );
+      addElementToLog(
+        "Computer",
+        computerHit["x"],
+        computerHit["y"],
+        computerHit["result"],
+      );
     } catch (error) {
       console.error("Error attacking:", error);
       alert("Error attacking!");
@@ -93,7 +111,7 @@ createEmptyGrid(computerGrid, true);
 function displayShips(gridElement, ships) {
   const cells = gridElement.querySelectorAll(".cell");
 
-  for (let i = 0; i < ships.length; i++){
+  for (let i = 0; i < ships.length; i++) {
     const ship = ships[i];
     const shipColor = possibleColors[i % possibleColors.length];
 
@@ -166,4 +184,19 @@ function displayHits(gridElement, hits) {
       }
     }
   }
+}
+
+const logTableBodyEl = document.getElementById("log-table-body");
+
+function addElementToLog(attacker, x, y, result) {
+  const row = document.createElement("tr");
+
+  row.innerHTML = `
+        <td>${attacker}</td>
+        <td>${x}</td>
+        <td>${y}</td>
+        <td>${result}</td>
+    `;
+
+  logTableBodyEl.appendChild(row);
 }

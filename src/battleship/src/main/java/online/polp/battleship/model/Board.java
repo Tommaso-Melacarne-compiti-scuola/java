@@ -32,7 +32,7 @@ public class Board {
      * @param point The point to attack
      * @return The result of the attack
      */
-    public AttackResult attack(Point point) {
+    public Hit attack(Point point) {
         Hit hit = new Hit(AttackResult.MISS, point);
 
         for (Ship ship : ships) {
@@ -44,12 +44,12 @@ public class Board {
                 }
 
                 hits.add(hit);
-                return hit.getResult();
+                return hit;
             }
         }
 
         hits.add(hit);
-        return hit.getResult();
+        return hit;
     }
 
     public void addRandomShip(int length) {

@@ -22,7 +22,7 @@ public class Player {
      * @param point The point to attack
      * @return The result of the attack
      */
-    public AttackResult attack(Point point) {
+    public Hit attack(Point point) {
         return board.attack(point);
     }
 }

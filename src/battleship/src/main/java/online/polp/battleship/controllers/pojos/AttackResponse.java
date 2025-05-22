@@ -1,12 +1,12 @@
 package online.polp.battleship.controllers.pojos;
 
 import lombok.Data;
-import online.polp.battleship.model.AttackResult;
+import online.polp.battleship.model.Hit;
 
 @Data
 public class AttackResponse {
-    private final AttackResult playerAttackResult;
-    private final AttackResult computerAttackResult;
+    private final Hit playerHit;
+    private final Hit computerHit;
 
     private final GameUpdate gameUpdate;
 }

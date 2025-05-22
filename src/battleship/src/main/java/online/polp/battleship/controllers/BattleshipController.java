@@ -6,10 +6,7 @@ import online.polp.battleship.controllers.pojos.AttackResponse;
 import online.polp.battleship.controllers.pojos.NewGameRequest;
 import online.polp.battleship.controllers.pojos.GameUpdate;
 import online.polp.battleship.exceptions.ShipAddException;
-import online.polp.battleship.model.AttackResult;
-import online.polp.battleship.model.BattleshipModel;
-import online.polp.battleship.model.Player;
-import online.polp.battleship.model.Point;
+import online.polp.battleship.model.*;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -71,11 +68,10 @@ class BattleshipController {
 
     @PutMapping("/attack/{index}")
     public AttackResponse attack(@PathVariable int index) {
-        AttackResult playerAttackResult = BattleshipModel
+        Hit playerAttackResult = BattleshipModel
             .getComputer()
-            .getBoard()
             .attack(Point.fromIndex(index, BoardConstants.BOARD_SIZE));
-        AttackResult computerAttackResult = BattleshipModel.getPlayer().getBoard().attack(
+        Hit computerAttackResult = BattleshipModel.getPlayer().attack(
             Point.randomPoint(BoardConstants.BOARD_SIZE)
         );
 

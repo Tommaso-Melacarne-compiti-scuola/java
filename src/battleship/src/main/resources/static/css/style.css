@@ -1,28 +1,54 @@
 .grid {
-    display: grid;
-    grid-template-columns: repeat(10, 30px);
-    margin: 20px;
-    background-color: rgba(222, 226, 230, 0.10);
-    grid-gap: 1px;
-    border: 1px solid rgba(222, 226, 230, 0.10);
+  display: grid;
+  grid-template-columns: repeat(10, 30px);
+  margin: 20px;
+  background-color: rgba(222, 226, 230, 0.1);
+  grid-gap: 1px;
+  border: 1px solid rgba(222, 226, 230, 0.1);
 }
 
 .cell {
-    width: 30px;
-    height: 30px;
-    text-align: center;
-    line-height: 30px;
-    background-color: #212529;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  line-height: 30px;
+  background-color: #212529;
 }
 
 .miss {
-    background-color: cyan;
+  background-color: cyan;
 }
 
 .hit {
-    background-color: red;
+  animation: explosion-animation 2s steps(6) forwards;
 }
 
 .sunk {
-    background-color: blue;
+  background-color: blue;
+}
+
+@keyframes explosion-animation {
+  0% {
+    background-image: url("../images/explosions/exp1.png");
+  }
+  20% {
+    background-image: url("../images/explosions/exp2.png");
+  }
+  40% {
+    background-image: url("../images/explosions/exp3.png");
+  }
+  60% {
+    background-image: url("../images/explosions/exp4.png");
+  }
+  80% {
+    background-image: url("../images/explosions/exp5.png");
+  }
+  100% {
+    background-image: url("../images/explosions/exp6.png");
+  }
+}
+
+.log-table {
+  min-height: 200px;
+  text-align: center;
 }

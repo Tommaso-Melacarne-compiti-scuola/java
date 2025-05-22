@@ -51,5 +51,26 @@
 .log-table {
   min-height: 200px;
   text-align: center;
-  max-height: 200px;
+  width: 100%;
+}
+
+.table-responsive {
+  border-radius: 4px;
+  margin-top: 20px;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+/* Modernize scrollbar */
+::-webkit-scrollbar {
+  width: 0.25rem;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #58585E;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #212529;
 }

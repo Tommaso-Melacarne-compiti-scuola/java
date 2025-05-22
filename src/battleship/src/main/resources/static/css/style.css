@@ -7,6 +7,10 @@
   border: 1px solid rgba(222, 226, 230, 0.1);
 }
 
+#computer-grid {
+  cursor: crosshair;
+}
+
 .cell {
   width: 30px;
   height: 30px;
@@ -16,7 +20,7 @@
 }
 
 .miss {
-  background-color: cyan;
+  background-image: url("../images/water.png");
 }
 
 .hit {

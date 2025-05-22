@@ -2,16 +2,20 @@ package online.polp.battleship.controllers;
 
 import online.polp.battleship.constants.BoardConstants;
 import online.polp.battleship.controllers.pojos.AttackResponse;
+import online.polp.battleship.controllers.pojos.GameUpdate;
 import online.polp.battleship.controllers.pojos.HasStartedResponse;
 import online.polp.battleship.controllers.pojos.NewGameRequest;
-import online.polp.battleship.controllers.pojos.GameUpdate;
 import online.polp.battleship.exceptions.ShipAddException;
-import online.polp.battleship.model.*;
+import online.polp.battleship.model.BattleshipModel;
+import online.polp.battleship.model.Hit;
+import online.polp.battleship.model.Player;
+import online.polp.battleship.model.Point;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:63342")
 class BattleshipController {
+
     /**
      * Get Update
      *
@@ -71,9 +75,32 @@ class BattleshipController {
         Hit playerAttackResult = BattleshipModel
             .getComputer()
             .attack(Point.fromIndex(index, BoardConstants.BOARD_SIZE));
-        Hit computerAttackResult = BattleshipModel.getPlayer().attack(
-            Point.randomPoint(BoardConstants.BOARD_SIZE)
-        );
+
+        Hit computerAttackResult;
+
+        while (true) {
+            Point randomPoint = Point.randomPoint(BoardConstants.BOARD_SIZE);
+
+            // Check if the point is already attacked
+            boolean wasAttackAlreadyMade = BattleshipModel
+                .getPlayer()
+                .getBoard()
+                .getHits()
+                .stream()
+                .anyMatch((hit) -> hit
+                    .getX()
+                    .equals(randomPoint.getX()) && hit.getY().equals(randomPoint.getY()));
+
+            if (wasAttackAlreadyMade) {
+                continue;
+            }
+
+            computerAttackResult = BattleshipModel.getPlayer().attack(
+                randomPoint
+            );
+            break;
+        }
+
 
         int currentTurn = BattleshipModel.getCurrentPlayerTurn();
 

@@ -96,16 +96,12 @@ function createEmptyGrid(container, isComputerGrid) {
   }
 }
 
-// Initialize ship selection interface
 function initShipPlacement() {
-  // Clear any existing ship selections
   shipsToPlace.innerHTML = "";
   placedShips = [];
 
-  // Enable start game button regardless of ship placement
   startGameBtn.disabled = false;
 
-  // Create ship selection buttons
   SHIP_CONFIGS.forEach((ship, index) => {
     const shipButton = document.createElement("div");
     shipButton.classList.add("ship-selection");
@@ -115,12 +111,10 @@ function initShipPlacement() {
     shipButton.dataset.shipType = index;
 
     shipButton.addEventListener("click", () => {
-      // Deselect any previously selected ship
       document.querySelectorAll(".ship-selection.selected").forEach((el) => {
         el.classList.remove("selected");
       });
 
-      // Select this ship
       shipButton.classList.add("selected");
       selectedShipType = index;
     });
@@ -128,22 +122,6 @@ function initShipPlacement() {
     shipsToPlace.appendChild(shipButton);
   });
 
-  // Set up right-click to toggle orientation
-  playerGrid.addEventListener("contextmenu", (e) => {
-    e.preventDefault();
-    isHorizontal = !isHorizontal;
-
-    // If hovering over a cell, update the preview
-    const hoveredCell = playerGrid.querySelector(
-      ".cell.placement-hover, .cell.placement-invalid",
-    );
-    if (hoveredCell) {
-      clearShipPlacementPreview();
-      previewShipPlacement(hoveredCell);
-    }
-  });
-
-  // Set up 'R' key to toggle orientation
   document.addEventListener("keydown", (e) => {
     if (
       e.key.toLowerCase() === "r" &&
@@ -170,7 +148,6 @@ function initShipPlacement() {
 function previewShipPlacement(cell) {
   if (selectedShipType === null) return;
 
-  // Check if this ship type has already been placed
   if (placedShips.some((ship) => ship.shipType === selectedShipType)) return;
 
   const shipLength = SHIP_CONFIGS[selectedShipType].length;
@@ -180,12 +157,10 @@ function previewShipPlacement(cell) {
   const shipCells = [];
   let isValid = true;
 
-  // Calculate all cells the ship would occupy
   for (let i = 0; i < shipLength; i++) {
     const x = isHorizontal ? startX + i : startX;
     const y = isHorizontal ? startY : startY + i;
 
-    // Check if ship is within grid boundaries
     if (x >= GRID_SIZE || y >= GRID_SIZE) {
       isValid = false;
       break;
@@ -194,7 +169,6 @@ function previewShipPlacement(cell) {
     const index = x + y * GRID_SIZE;
     const shipCell = playerGrid.querySelector(`.cell[data-index="${index}"]`);
 
-    // Check if cell exists and is already occupied by another ship
     if (!shipCell) {
       isValid = false;
       break;
@@ -207,13 +181,11 @@ function previewShipPlacement(cell) {
     shipCells.push(shipCell);
   }
 
-  // Apply visual preview
   shipCells.forEach((shipCell) => {
     shipCell.classList.add(isValid ? "placement-hover" : "placement-invalid");
   });
 }
 
-// Clear ship placement preview
 function clearShipPlacementPreview() {
   playerGrid
     .querySelectorAll(".cell.placement-hover, .cell.placement-invalid")
@@ -222,11 +194,9 @@ function clearShipPlacementPreview() {
     });
 }
 
-// Place a ship on the grid
 function placeShip(cell) {
   if (selectedShipType === null) return;
 
-  // Check if this ship type has already been placed
   if (placedShips.some((ship) => ship.shipType === selectedShipType)) return;
 
   const shipLength = SHIP_CONFIGS[selectedShipType].length;
@@ -236,7 +206,6 @@ function placeShip(cell) {
   const shipCells = [];
   let isValid = true;
 
-  // Calculate all cells the ship would occupy
   for (let i = 0; i < shipLength; i++) {
     const x = isHorizontal ? startX + i : startX;
     const y = isHorizontal ? startY : startY + i;
@@ -250,7 +219,6 @@ function placeShip(cell) {
     const index = x + y * GRID_SIZE;
     const shipCell = playerGrid.querySelector(`.cell[data-index="${index}"]`);
 
-    // Check if cell exists and is already occupied by another ship
     if (!shipCell) {
       isValid = false;
       break;
@@ -266,7 +234,6 @@ function placeShip(cell) {
 
   if (!isValid) return;
 
-  // Place the ship
   const shipColor = possibleColors[selectedShipType % possibleColors.length];
   const points = [];
 
@@ -276,7 +243,6 @@ function placeShip(cell) {
     points.push({ x, y });
   });
 
-  // Add to placed ships
   placedShips.push({
     shipType: selectedShipType,
     position: { x: startX, y: startY },
@@ -285,7 +251,6 @@ function placeShip(cell) {
     points,
   });
 
-  // Mark ship as placed in the selection UI
   const shipButton = document.querySelector(
     `.ship-selection[data-shipType="${selectedShipType}"]`,
   );
@@ -294,14 +259,10 @@ function placeShip(cell) {
     shipButton.classList.add("placed");
   }
 
-  // Clear selection
   selectedShipType = null;
 
-  // Check if all ships are placed
   if (placedShips.length === SHIP_CONFIGS.length) {
-    // Enable the start game button
     startGameBtn.disabled = false;
-    // Force the button to be enabled (in case other code is disabling it)
     setTimeout(() => {
       startGameBtn.disabled = false;
     }, 100);
@@ -310,22 +271,18 @@ function placeShip(cell) {
 
 // Reset ship placement
 function resetShipPlacement() {
-  // Clear all ships from the grid
   playerGrid.querySelectorAll(".cell").forEach((cell) => {
     cell.classList.remove("ship");
     cell.style.backgroundColor = "";
   });
 
-  // Reset ship selection UI
   document.querySelectorAll(".ship-selection").forEach((shipBtn) => {
     shipBtn.classList.remove("selected", "placed");
   });
 
-  // Reset state
   placedShips = [];
   selectedShipType = null;
 
-  // Enable start game button (user can start with no ships)
   startGameBtn.disabled = false;
 }
 
@@ -600,14 +557,12 @@ async function attack(cell, cellIndex) {
 
     const result = await response.json();
 
-    // Process the game update first to update the UI
     processUpdate(result["gameUpdate"]);
 
     const playerHit = result["playerHit"];
     const computerHit = result["computerHit"];
     const currentTurn = result["currentTurn"];
 
-    // Add log entries
     addElementToLog(
       currentTurn,
       "Player",
@@ -635,19 +590,15 @@ async function attack(cell, cellIndex) {
  */
 function isGameOver(gameUpdate) {
   try {
-    // For playerShips, we check if they're hit by computerHits
     const playerShipsSunk = countSunkShips(
       gameUpdate.playerShips,
       gameUpdate.playerHits,
     );
 
-    // For computer ships, we need to count how many distinct ships have been sunk
-    // by checking the "SUNK" results in computerHits
     const computerSunkCount = gameUpdate.computerHits.filter(
       (hit) => hit.result === "SUNK",
     ).length;
 
-    // Game is over if all ships of either player are sunk
     return (
       playerShipsSunk >= SHIP_CONFIGS.length ||
       computerSunkCount >= SHIP_CONFIGS.length
@@ -690,9 +641,7 @@ function countSunkShips(ships, hits) {
  */
 function isShipSunk(ship, hits) {
   try {
-    // A ship is sunk if all of its points have been hit
     for (const point of ship.points) {
-      // Check if this point has been hit
       const isPointHit = hits.some(
         (hit) =>
           hit.x === point.x &&
@@ -700,13 +649,11 @@ function isShipSunk(ship, hits) {
           (hit.result === "HIT" || hit.result === "SUNK"),
       );
 
-      // If any point hasn't been hit, the ship isn't sunk
       if (!isPointHit) {
         return false;
       }
     }
 
-    // All points have been hit, so the ship is sunk
     return true;
   } catch (error) {
     console.error("Error in isShipSunk:", error);
@@ -741,19 +688,15 @@ function handleGameOver(gameUpdate) {
  */
 function determineWinner(gameUpdate) {
   try {
-    // For playerShips, we check if they're hit by computerHits
     const playerShipsSunk = countSunkShips(
       gameUpdate.playerShips,
       gameUpdate.playerHits,
     );
 
-    // For computer ships, we count SUNK results in computerHits
     const computerSunkCount = gameUpdate.computerHits.filter(
       (hit) => hit.result === "SUNK",
     ).length;
-
-    // The player who does NOT have all their ships sunk is the winner
-    // or the player who sunk all opponent ships is the winner
+    
     if (computerSunkCount >= SHIP_CONFIGS.length) {
       return "Player";
     } else {
@@ -771,7 +714,6 @@ function determineWinner(gameUpdate) {
  */
 function showWinnerModal(winner) {
   try {
-    // Make sure the modal element exists
     const modalElement = document.getElementById("winnerModal");
     if (!modalElement) {
       console.error("Modal element not found!");
@@ -779,29 +721,24 @@ function showWinnerModal(winner) {
       return;
     }
 
-    // Update modal content
     const winnerName = document.getElementById("winner-name");
     const winnerMessage = document.getElementById("winner-message");
     const winnerIcon = document.getElementById("winner-icon");
 
-    // Set winner name
     if (winnerName) {
       winnerName.textContent = winner;
 
-      // Apply different color based on who won
       if (winner === "Player") {
-        winnerName.style.color = "#ffc107"; // gold for player
+        winnerName.style.color = "#ffc107";
       } else {
-        winnerName.style.color = "#dc3545"; // red for computer
+        winnerName.style.color = "#dc3545";
       }
     }
 
-    // Set winner message
     if (winnerMessage) {
       winnerMessage.textContent = `wins the battle!`;
     }
 
-    // Set appropriate icon
     if (winnerIcon) {
       if (winner === "Player") {
         winnerIcon.innerHTML = '<i class="bi bi-trophy text-success"></i>';
@@ -810,27 +747,21 @@ function showWinnerModal(winner) {
       }
     }
 
-    // Set up play again button
     const playAgainBtn = document.getElementById("play-again-btn");
     if (playAgainBtn) {
-      // Remove any existing event listeners
       const newPlayAgainBtn = playAgainBtn.cloneNode(true);
       playAgainBtn.parentNode.replaceChild(newPlayAgainBtn, playAgainBtn);
 
-      // Add the click event listener
       newPlayAgainBtn.addEventListener("click", () => {
-        // Hide modal before resetting
         const bootstrapModal = bootstrap.Modal.getInstance(modalElement);
         if (bootstrapModal) {
           bootstrapModal.hide();
         }
 
-        // Reset the game
         resetGameBtn.click();
       });
     }
 
-    // Show the modal using Bootstrap
     try {
       const winnerModal = new bootstrap.Modal(modalElement);
       winnerModal.show();

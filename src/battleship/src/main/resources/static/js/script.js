@@ -804,7 +804,7 @@ function showWinnerModal(winner) {
     // Set appropriate icon
     if (winnerIcon) {
       if (winner === "Player") {
-        winnerIcon.innerHTML = '<i class="bi bi-trophy text-warning"></i>';
+        winnerIcon.innerHTML = '<i class="bi bi-trophy text-success"></i>';
       } else {
         winnerIcon.innerHTML = '<i class="bi bi-robot text-danger"></i>';
       }

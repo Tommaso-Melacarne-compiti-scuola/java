@@ -38,12 +38,14 @@ public class Board {
         for (Ship ship : ships) {
             if (ship.isHit(point)) {
                 hit.setResult(AttackResult.HIT);
-
+                
+                // Add the hit to the hits list BEFORE checking if the ship is sunk
+                hits.add(hit);
+                
                 if (ship.isSunk(hits)) {
                     hit.setResult(AttackResult.SUNK);
                 }
 
-                hits.add(hit);
                 return hit;
             }
         }

@@ -56,12 +56,9 @@
   background-image: url("../images/water.png");
 }
 
-.hit {
-  animation: explosion-animation 2s steps(6) forwards;
-}
-
+.hit,
 .sunk {
-  background-color: blue;
+  animation: explosion-animation 2s steps(6) forwards;
 }
 
 @keyframes explosion-animation {

@@ -2,15 +2,15 @@ const baseUrl = "http://localhost:3000";
 const GRID_SIZE = 10;
 
 const possibleColors = [
-  "#ed5f55",
-  "#f7ac57",
-  "#cfed55",
-  "#55eda6",
-  "#64f0f5",
-  "#8164f5",
-  "#c564f5",
-  "#ff8cd7",
-  "#a86f1e",
+    "#ed5f55",
+    "#f7ac57",
+    "#cfed55",
+    "#55eda6",
+    "#64f0f5",
+    "#8164f5",
+    "#c564f5",
+    "#ff8cd7",
+    "#a86f1e",
 ];
 
 const playerGrid = document.getElementById("player-grid");
@@ -55,17 +55,17 @@ const logContainerEl = document.getElementById("log-container");
  * @param {boolean} isComputerGrid - Whether this is the computer's grid (for event handling)
  */
 function createEmptyGrid(container, isComputerGrid) {
-  for (let i = 0; i < Math.pow(GRID_SIZE, 2); i++) {
-    const cell = document.createElement("div");
-    cell.classList.add("cell");
+    for (let i = 0; i < Math.pow(GRID_SIZE, 2); i++) {
+        const cell = document.createElement("div");
+        cell.classList.add("cell");
 
-    if (isComputerGrid) {
-      cell.style.pointerEvents = "none";
-      cell.addEventListener("click", async () => attack(cell, i));
+        if (isComputerGrid) {
+            cell.style.pointerEvents = "none";
+            cell.addEventListener("click", async () => attack(cell, i));
+        }
+
+        container.appendChild(cell);
     }
-
-    container.appendChild(cell);
-  }
 }
 
 /**
@@ -76,41 +76,41 @@ function createEmptyGrid(container, isComputerGrid) {
  * @returns {Promise<void>}
  */
 async function attack(cell, cellIndex) {
-  try {
-    const response = await fetch(`${baseUrl}/attack/${cellIndex}`, {
-      method: "PUT",
-    });
+    try {
+        const response = await fetch(`${baseUrl}/attack/${cellIndex}`, {
+            method: "PUT",
+        });
 
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
+        if (!response.ok) {
+            throw new Error("Network response was not ok");
+        }
+
+        const result = await response.json();
+
+        processUpdate(result["gameUpdate"]);
+
+        const playerHit = result["playerHit"];
+        const computerHit = result["computerHit"];
+        const currentTurn = result["currentTurn"];
+
+        addElementToLog(
+            currentTurn,
+            "Player",
+            playerHit["x"],
+            playerHit["y"],
+            playerHit["result"],
+        );
+        addElementToLog(
+            currentTurn,
+            "Computer",
+            computerHit["x"],
+            computerHit["y"],
+            computerHit["result"],
+        );
+    } catch (error) {
+        console.error("Error attacking:", error);
+        alert("Error attacking!");
     }
-
-    const result = await response.json();
-
-    processUpdate(result["gameUpdate"]);
-
-    const playerHit = result["playerHit"];
-    const computerHit = result["computerHit"];
-    const currentTurn = result["currentTurn"];
-
-    addElementToLog(
-      currentTurn,
-      "Player",
-      playerHit["x"],
-      playerHit["y"],
-      playerHit["result"],
-    );
-    addElementToLog(
-      currentTurn,
-      "Computer",
-      computerHit["x"],
-      computerHit["y"],
-      computerHit["result"],
-    );
-  } catch (error) {
-    console.error("Error attacking:", error);
-    alert("Error attacking!");
-  }
 }
 
 createEmptyGrid(playerGrid, false);
@@ -122,44 +122,44 @@ createEmptyGrid(computerGrid, true);
  * @param {Ship[]} ships - An array of ship objects, each containing an array of indices.
  */
 function displayShips(gridElement, ships) {
-  const cells = gridElement.querySelectorAll(".cell");
+    const cells = gridElement.querySelectorAll(".cell");
 
-  for (let i = 0; i < ships.length; i++) {
-    const ship = ships[i];
-    const shipColor = possibleColors[i % possibleColors.length];
+    for (let i = 0; i < ships.length; i++) {
+        const ship = ships[i];
+        const shipColor = possibleColors[i % possibleColors.length];
 
-    for (const point of ship.points) {
-      const index = point.x + GRID_SIZE * point.y;
+        for (const point of ship.points) {
+            const index = point.x + GRID_SIZE * point.y;
 
-      if (cells[index]) {
-        cells[index].classList.add("ship");
-        cells[index].style.backgroundColor = shipColor;
-      }
+            if (cells[index]) {
+                cells[index].classList.add("ship");
+                cells[index].style.backgroundColor = shipColor;
+            }
+        }
     }
-  }
 }
 
 // Start game button, which will fetch the game update and start the game
 startGameBtn.addEventListener("click", async () => {
-  startGameBtn.disabled = true;
+    startGameBtn.disabled = true;
 
-  try {
-    const response = await fetch(`${baseUrl}/new-game`, {
-      method: "POST",
-    });
+    try {
+        const response = await fetch(`${baseUrl}/new-game`, {
+            method: "POST",
+        });
 
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
+        if (!response.ok) {
+            throw new Error("Network response was not ok");
+        }
+
+        /** @type {GameUpdate} */
+        const data = await response.json();
+        startGame(data);
+    } catch (error) {
+        console.error("Error loading grids:", error);
+        alert("Error loading grids!");
+        startGameBtn.disabled = false;
     }
-
-    /** @type {GameUpdate} */
-    const data = await response.json();
-    startGame(data);
-  } catch (error) {
-    console.error("Error loading grids:", error);
-    alert("Error loading grids!");
-    startGameBtn.disabled = false;
-  }
 });
 
 /**
@@ -168,16 +168,16 @@ startGameBtn.addEventListener("click", async () => {
  * @param {GameUpdate} data  - The game update object containing player ships and hits.
  */
 function startGame(data) {
-  processUpdate(data);
+    // Enable the computer grid for interaction
+    for (const cell of computerGrid.querySelectorAll(".cell")) {
+        cell.style.pointerEvents = "auto";
+    }
 
-  // Enable the computer grid for interaction
-  for (const cell of computerGrid.querySelectorAll(".cell")) {
-    cell.style.pointerEvents = "auto";
-  }
+    processUpdate(data);
 
-  startGameBtn.classList.add("d-none");
-  resetGameBtn.classList.remove("d-none");
-  logContainerEl.classList.remove("d-none");
+    startGameBtn.classList.add("d-none");
+    resetGameBtn.classList.remove("d-none");
+    logContainerEl.classList.remove("d-none");
 }
 
 /**
@@ -186,9 +186,9 @@ function startGame(data) {
  * @param {GameUpdate} gameUpdate - The game update object containing player ships and hits.
  */
 function processUpdate(gameUpdate) {
-  displayShips(playerGrid, gameUpdate.playerShips);
-  displayHits(computerGrid, gameUpdate.computerHits);
-  displayHits(playerGrid, gameUpdate.playerHits);
+    displayShips(playerGrid, gameUpdate.playerShips);
+    displayHits(computerGrid, gameUpdate.computerHits);
+    displayHits(playerGrid, gameUpdate.playerHits);
 }
 
 /**
@@ -197,15 +197,17 @@ function processUpdate(gameUpdate) {
  * @param hits - An array of hit objects containing x, y coordinates and result.
  */
 function displayHits(gridElement, hits) {
-  const cells = gridElement.querySelectorAll(".cell");
+    const cells = gridElement.querySelectorAll(".cell");
 
-  for (const hit of hits) {
-    const index = hit.x + GRID_SIZE * hit.y;
+    for (const hit of hits) {
+        const index = hit.x + GRID_SIZE * hit.y;
 
-    if (cells[index]) {
-      cells[index].classList.add(hit.result.toLowerCase());
+        if (cells[index]) {
+            cells[index].classList.add(hit.result.toLowerCase());
+
+            cells[index].style.pointerEvents = "none";
+        }
     }
-  }
 }
 
 /**
@@ -218,9 +220,9 @@ function displayHits(gridElement, hits) {
  * @param {string} result
  */
 function addElementToLog(currentTurn, attacker, x, y, result) {
-  const row = document.createElement("tr");
+    const row = document.createElement("tr");
 
-  row.innerHTML = `
+    row.innerHTML = `
         <td>${currentTurn}</td>
         <td>${attacker}</td>
         <td>${x}</td>
@@ -228,30 +230,30 @@ function addElementToLog(currentTurn, attacker, x, y, result) {
         <td>${result}</td>
     `;
 
-  logTableBodyEl.prepend(row);
+    logTableBodyEl.prepend(row);
 }
 
 // Checks if the game has started and if so, fetches the game update, trying also to reconstruct the log
 document.addEventListener("DOMContentLoaded", async () => {
-  const hasStarted = await fetch(`${baseUrl}/has-started`).then((response) => {
-    if (!response.ok) {
-      throw new Error("Network response was not ok");
-    }
-    return response.json();
-  });
-
-  if (hasStarted["hasStarted"]) {
-    const data = await fetch(`${baseUrl}/get-update`).then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return response.json();
+    const hasStarted = await fetch(`${baseUrl}/has-started`).then((response) => {
+        if (!response.ok) {
+            throw new Error("Network response was not ok");
+        }
+        return response.json();
     });
 
-    inferLogFromHits(data["playerHits"], data["computerHits"]);
+    if (hasStarted["hasStarted"]) {
+        const data = await fetch(`${baseUrl}/get-update`).then((response) => {
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            return response.json();
+        });
 
-    startGame(data);
-  }
+        inferLogFromHits(data["playerHits"], data["computerHits"]);
+
+        startGame(data);
+    }
 });
 
 /**
@@ -261,34 +263,34 @@ document.addEventListener("DOMContentLoaded", async () => {
  * @param {Hit[]} computerHits
  */
 function inferLogFromHits(playerHits, computerHits) {
-  for (let i = 0; i < playerHits.length + computerHits.length; i++) {
-    const currentTurn = Math.floor(i / 2) + 1;
-    const attacker = i % 2 === 0 ? "Player" : "Computer";
-    const hit =
-      i % 2 === 0 ? computerHits[i / 2] : playerHits[Math.floor(i / 2)];
+    for (let i = 0; i < playerHits.length + computerHits.length; i++) {
+        const currentTurn = Math.floor(i / 2) + 1;
+        const attacker = i % 2 === 0 ? "Player" : "Computer";
+        const hit =
+            i % 2 === 0 ? computerHits[i / 2] : playerHits[Math.floor(i / 2)];
 
-    addElementToLog(currentTurn, attacker, hit["x"], hit["y"], hit["result"]);
-  }
+        addElementToLog(currentTurn, attacker, hit["x"], hit["y"], hit["result"]);
+    }
 }
 
 // Reset game button, which will reset the game and reload the page
 resetGameBtn.addEventListener("click", async () => {
-  resetGameBtn.disabled = true;
-  try {
-    const res = await fetch(`${baseUrl}/reset-game`, {
-      method: "DELETE",
-    });
+    resetGameBtn.disabled = true;
+    try {
+        const res = await fetch(`${baseUrl}/reset-game`, {
+            method: "DELETE",
+        });
 
-    if (!res.ok) {
-      throw new Error("Network response was not ok");
+        if (!res.ok) {
+            throw new Error("Network response was not ok");
+        }
+
+        await res.json();
+
+        location.reload();
+    } catch (error) {
+        console.error("Error resetting game:", error);
+        alert("Error resetting game!");
+        resetGameBtn.disabled = false;
     }
-
-    await res.json();
-
-    location.reload();
-  } catch (error) {
-    console.error("Error resetting game:", error);
-    alert("Error resetting game!");
-    resetGameBtn.disabled = false;
-  }
 });

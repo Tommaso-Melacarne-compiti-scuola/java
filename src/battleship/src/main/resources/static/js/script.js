@@ -373,6 +373,12 @@ startGameBtn.addEventListener("click", async () => {
     return;
   }
 
+  // Clear any ship selection before starting the game
+  selectedShipType = null;
+  document.querySelectorAll(".ship-selection.selected").forEach((el) => {
+    el.classList.remove("selected");
+  });
+
   startGameBtn.disabled = true;
 
   try {
@@ -420,20 +426,19 @@ startGameBtn.addEventListener("click", async () => {
  * @param {GameUpdate} data  - The game update object containing player ships and hits.
  */
 function startGame(data) {
-  // Hide placement controls
   placementControls.classList.add("d-none");
 
-  // Enable the computer grid for interaction
   for (const cell of computerGrid.querySelectorAll(".cell")) {
     cell.style.pointerEvents = "auto";
   }
 
-  // Disable player grid interaction
   for (const cell of playerGrid.querySelectorAll(".cell")) {
     cell.removeEventListener("mouseover", previewShipPlacement);
     cell.removeEventListener("mouseout", clearShipPlacementPreview);
     cell.removeEventListener("click", placeShip);
   }
+
+  playerGrid.style.cursor = "default";
 
   processUpdate(data);
 
@@ -455,7 +460,6 @@ function processUpdate(gameUpdate) {
 
     // Check for game over after each update
     if (isGameOver(gameUpdate)) {
-      console.log("Game over detected in processUpdate");
       handleGameOver(gameUpdate);
     }
   } catch (error) {
@@ -643,12 +647,6 @@ function isGameOver(gameUpdate) {
       (hit) => hit.result === "SUNK",
     ).length;
 
-    // Debug information
-    console.log(
-      `Player ships sunk: ${playerShipsSunk}, Computer ships sunk: ${computerSunkCount}`,
-    );
-    console.log(`Total ships to sink: ${SHIP_CONFIGS.length}`);
-
     // Game is over if all ships of either player are sunk
     return (
       playerShipsSunk >= SHIP_CONFIGS.length ||
@@ -722,18 +720,13 @@ function isShipSunk(ship, hits) {
  */
 function handleGameOver(gameUpdate) {
   try {
-    console.log("Game over detected!");
-
     // Disable all cells to prevent further attacks
     computerGrid.querySelectorAll(".cell").forEach((cell) => {
       cell.style.pointerEvents = "none";
     });
 
-    // Determine the winner
     const winner = determineWinner(gameUpdate);
-    console.log(`Winner determined: ${winner}`);
 
-    // Show the winner modal
     showWinnerModal(winner);
   } catch (error) {
     console.error("Error in handleGameOver:", error);
@@ -758,10 +751,6 @@ function determineWinner(gameUpdate) {
     const computerSunkCount = gameUpdate.computerHits.filter(
       (hit) => hit.result === "SUNK",
     ).length;
-
-    console.log(
-      `Determining winner - Player ships sunk: ${playerShipsSunk}, Computer ships sunk: ${computerSunkCount}`,
-    );
 
     // The player who does NOT have all their ships sunk is the winner
     // or the player who sunk all opponent ships is the winner

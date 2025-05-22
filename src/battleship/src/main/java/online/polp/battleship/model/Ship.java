@@ -56,16 +56,23 @@ public class Ship {
      * @return true if the ships collide, false otherwise
      */
     public boolean collidesWith(Ship other) {
-        Point end = position.translateInDirection(orientation, length - 1);
-
-        return position.isInsideRectangle(
-            other.position,
-            other.position.translateInDirection(
-                other.orientation,
-                other.length - 1
-            )
-        ) ||
-            other.position.isInsideRectangle(position, end);
+        // Get all points occupied by this ship
+        List<Point> thisPoints = this.computePoints();
+        
+        // Get all points occupied by the other ship
+        List<Point> otherPoints = other.computePoints();
+        
+        // Check if any point of this ship is in the same position as any point of the other ship
+        for (Point thisPoint : thisPoints) {
+            for (Point otherPoint : otherPoints) {
+                if (thisPoint.getX().equals(otherPoint.getX()) && 
+                    thisPoint.getY().equals(otherPoint.getY())) {
+                    return true;
+                }
+            }
+        }
+        
+        return false;
     }
 
     public List<Point> computePoints() {

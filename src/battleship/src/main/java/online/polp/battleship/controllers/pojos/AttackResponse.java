@@ -5,6 +5,8 @@ import online.polp.battleship.model.Hit;
 
 @Data
 public class AttackResponse {
+    private final int currentTurn;
+
     private final Hit playerHit;
     private final Hit computerHit;
 

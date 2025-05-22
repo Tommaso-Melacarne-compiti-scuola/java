@@ -51,4 +51,5 @@
 .log-table {
   min-height: 200px;
   text-align: center;
+  max-height: 200px;
 }

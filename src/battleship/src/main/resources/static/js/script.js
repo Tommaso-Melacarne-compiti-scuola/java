@@ -13,6 +13,13 @@ const possibleColors = [
   "#a86f1e",
 ];
 
+const playerGrid = document.getElementById("player-grid");
+const computerGrid = document.getElementById("computer-grid");
+const startGameBtn = document.getElementById("start-game-btn");
+const resetGameBtn = document.getElementById("reset-game-btn");
+const logTableBodyEl = document.getElementById("log-table-body");
+const logContainerEl = document.getElementById("log-container");
+
 /**
  * @typedef {Object} Point
  * @property x
@@ -53,52 +60,58 @@ function createEmptyGrid(container, isComputerGrid) {
     cell.classList.add("cell");
 
     if (isComputerGrid) {
-      cell.addEventListener("click", getAttackEventListener(cell, i));
+      cell.style.pointerEvents = "none";
+      cell.addEventListener("click", async () => attack(cell, i));
     }
 
     container.appendChild(cell);
   }
 }
 
-function getAttackEventListener(cell, cellIndex) {
-  return async () => {
-    try {
-      const response = await fetch(`${baseUrl}/attack/${cellIndex}`, {
-        method: "PUT",
-      });
+/**
+ * Handles the attack on a cell in the computer's grid.
+ *
+ * @param {HTMLElement} cell
+ * @param {number} cellIndex
+ * @returns {Promise<void>}
+ */
+async function attack(cell, cellIndex) {
+  try {
+    const response = await fetch(`${baseUrl}/attack/${cellIndex}`, {
+      method: "PUT",
+    });
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      const result = await response.json();
-
-      processUpdate(result["gameUpdate"]);
-
-      const playerHit = result["playerHit"];
-      const computerHit = result["computerHit"];
-
-      addElementToLog(
-        "Player",
-        playerHit["x"],
-        playerHit["y"],
-        playerHit["result"],
-      );
-      addElementToLog(
-        "Computer",
-        computerHit["x"],
-        computerHit["y"],
-        computerHit["result"],
-      );
-    } catch (error) {
-      console.error("Error attacking:", error);
-      alert("Error attacking!");
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
     }
-  };
-}
 
-const playerGrid = document.getElementById("player-grid");
-const computerGrid = document.getElementById("computer-grid");
+    const result = await response.json();
+
+    processUpdate(result["gameUpdate"]);
+
+    const playerHit = result["playerHit"];
+    const computerHit = result["computerHit"];
+    const currentTurn = result["currentTurn"];
+
+    addElementToLog(
+      currentTurn,
+      "Player",
+      playerHit["x"],
+      playerHit["y"],
+      playerHit["result"],
+    );
+    addElementToLog(
+      currentTurn,
+      "Computer",
+      computerHit["x"],
+      computerHit["y"],
+      computerHit["result"],
+    );
+  } catch (error) {
+    console.error("Error attacking:", error);
+    alert("Error attacking!");
+  }
+}
 
 createEmptyGrid(playerGrid, false);
 createEmptyGrid(computerGrid, true);
@@ -126,31 +139,46 @@ function displayShips(gridElement, ships) {
   }
 }
 
-const startGameBtn = document.getElementById("start-game-btn");
-
+// Start game button, which will fetch the game update and start the game
 startGameBtn.addEventListener("click", async () => {
   startGameBtn.disabled = true;
 
-  await fetch(`${baseUrl}/new-game`, {
-    method: "POST",
-  })
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-      return response.json();
-    })
-    .then((data) => {
-      processUpdate(data);
-
-      startGameBtn.classList.add("d-none");
-    })
-    .catch((error) => {
-      console.error("Error loading grids:", error);
-      alert("Error loading grids!");
-      startGameBtn.disabled = false;
+  try {
+    const response = await fetch(`${baseUrl}/new-game`, {
+      method: "POST",
     });
+
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    /** @type {GameUpdate} */
+    const data = await response.json();
+    startGame(data);
+  } catch (error) {
+    console.error("Error loading grids:", error);
+    alert("Error loading grids!");
+    startGameBtn.disabled = false;
+  }
 });
+
+/**
+ * Starts the game by processing the initial game data and toggling the visibility of the various buttons.
+ *
+ * @param {GameUpdate} data  - The game update object containing player ships and hits.
+ */
+function startGame(data) {
+  processUpdate(data);
+
+  // Enable the computer grid for interaction
+  for (const cell of computerGrid.querySelectorAll(".cell")) {
+    cell.style.pointerEvents = "auto";
+  }
+
+  startGameBtn.classList.add("d-none");
+  resetGameBtn.classList.remove("d-none");
+  logContainerEl.classList.remove("d-none");
+}
 
 /**
  * Processes the game update and updates the UI accordingly.
@@ -175,28 +203,92 @@ function displayHits(gridElement, hits) {
     const index = hit.x + GRID_SIZE * hit.y;
 
     if (cells[index]) {
-      if (hit.result === "HIT") {
-        cells[index].classList.add("hit");
-      } else if (hit.result === "MISS") {
-        cells[index].classList.add("miss");
-      } else if (hit.result === "SUNK") {
-        cells[index].classList.add("sunk");
-      }
+      cells[index].classList.add(hit.result.toLowerCase());
     }
   }
 }
 
-const logTableBodyEl = document.getElementById("log-table-body");
-
-function addElementToLog(attacker, x, y, result) {
+/**
+ * Adds a new row to the log table with the given parameters.
+ *
+ * @param {number} currentTurn
+ * @param {string} attacker
+ * @param {number} x
+ * @param {number} y
+ * @param {string} result
+ */
+function addElementToLog(currentTurn, attacker, x, y, result) {
   const row = document.createElement("tr");
 
   row.innerHTML = `
+        <td>${currentTurn}</td>
         <td>${attacker}</td>
         <td>${x}</td>
         <td>${y}</td>
         <td>${result}</td>
     `;
 
-  logTableBodyEl.appendChild(row);
+  logTableBodyEl.prepend(row);
 }
+
+// Checks if the game has started and if so, fetches the game update, trying also to reconstruct the log
+document.addEventListener("DOMContentLoaded", async () => {
+  const hasStarted = await fetch(`${baseUrl}/has-started`).then((response) => {
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+    return response.json();
+  });
+
+  if (hasStarted["hasStarted"]) {
+    const data = await fetch(`${baseUrl}/get-update`).then((response) => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return response.json();
+    });
+
+    inferLogFromHits(data["playerHits"], data["computerHits"]);
+
+    startGame(data);
+  }
+});
+
+/**
+ * Attempts to infer the log from the hits of both players.
+ *
+ * @param {Hit[]} playerHits
+ * @param {Hit[]} computerHits
+ */
+function inferLogFromHits(playerHits, computerHits) {
+  for (let i = 0; i < playerHits.length + computerHits.length; i++) {
+    const currentTurn = Math.floor(i / 2) + 1;
+    const attacker = i % 2 === 0 ? "Player" : "Computer";
+    const hit =
+      i % 2 === 0 ? computerHits[i / 2] : playerHits[Math.floor(i / 2)];
+
+    addElementToLog(currentTurn, attacker, hit["x"], hit["y"], hit["result"]);
+  }
+}
+
+// Reset game button, which will reset the game and reload the page
+resetGameBtn.addEventListener("click", async () => {
+  resetGameBtn.disabled = true;
+  try {
+    const res = await fetch(`${baseUrl}/reset-game`, {
+      method: "DELETE",
+    });
+
+    if (!res.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    await res.json();
+
+    location.reload();
+  } catch (error) {
+    console.error("Error resetting game:", error);
+    alert("Error resetting game!");
+    resetGameBtn.disabled = false;
+  }
+});

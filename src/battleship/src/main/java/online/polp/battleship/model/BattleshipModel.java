@@ -17,4 +17,16 @@ public class BattleshipModel {
         computer.getBoard().getHits().clear();
         computer.getBoard().getShips().clear();
     }
+
+    public static boolean hasStarted() {
+        if (player == null || computer == null) {
+            return false;
+        }
+
+        return !player.getBoard().getShips().isEmpty() && !computer.getBoard().getShips().isEmpty();
+    }
+
+    public static int getCurrentPlayerTurn() {
+        return player.getBoard().getHits().size();
+    }
 }

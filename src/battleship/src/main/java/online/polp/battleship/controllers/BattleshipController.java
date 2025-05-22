@@ -1,8 +1,8 @@
 package online.polp.battleship.controllers;
 
-import jakarta.annotation.PostConstruct;
 import online.polp.battleship.constants.BoardConstants;
 import online.polp.battleship.controllers.pojos.AttackResponse;
+import online.polp.battleship.controllers.pojos.HasStartedResponse;
 import online.polp.battleship.controllers.pojos.NewGameRequest;
 import online.polp.battleship.controllers.pojos.GameUpdate;
 import online.polp.battleship.exceptions.ShipAddException;
@@ -26,11 +26,11 @@ class BattleshipController {
     }
 
     @GetMapping("/has-started")
-    public boolean hasStarted() {
-        return BattleshipModel.getPlayer() != null && BattleshipModel.getComputer() != null;
+    public HasStartedResponse hasStarted() {
+        return new HasStartedResponse(BattleshipModel.hasStarted());
     }
 
-    @GetMapping("/reset-game")
+    @DeleteMapping("/reset-game")
     public GameUpdate resetGame() {
         BattleshipModel.resetGame();
 
@@ -75,7 +75,10 @@ class BattleshipController {
             Point.randomPoint(BoardConstants.BOARD_SIZE)
         );
 
+        int currentTurn = BattleshipModel.getCurrentPlayerTurn();
+
         return new AttackResponse(
+            currentTurn,
             playerAttackResult,
             computerAttackResult,
             new GameUpdate(

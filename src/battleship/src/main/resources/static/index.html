@@ -43,35 +43,26 @@
         </div>
       </div>
 
-      <div class="row">
+      <div class="row d-none" id="log-container">
         <table class="table log-table">
           <thead>
             <tr>
+              <th scope="col">Turno</th>
               <th scope="col">Attaccante</th>
               <th scope="col">X</th>
               <th scope="col">Y</th>
               <th scope="col">Risultato</th>
             </tr>
           </thead>
-          <tbody id="log-table-body">
-            <tr>
-              <td>Player /</td>
-              <td>2</td>
-              <td>4</td>
-              <td>HIT!</td>
-            </tr>
-            <tr>
-              <td>Computer /</td>
-              <td>3</td>
-              <td>5</td>
-              <td>MISS!</td>
-            </tr>
-          </tbody>
+          <tbody id="log-table-body"></tbody>
         </table>
       </div>
     </div>
 
-    <div class="d-flex justify-content-center mt-5">
+    <div class="d-flex justify-content-center mt-5 gap-2">
+      <button type="button" class="btn btn-danger d-none" id="reset-game-btn">
+        Reset Game
+      </button>
       <button type="button" class="btn btn-primary" id="start-game-btn">
         Start Game
       </button>

@@ -729,9 +729,9 @@ function showWinnerModal(winner) {
       winnerName.textContent = winner;
 
       if (winner === "Player") {
-        winnerName.style.color = "#ffc107";
+        winnerName.classList.add("text-success");
       } else {
-        winnerName.style.color = "#dc3545";
+        winnerName.classList.add("text-danger");
       }
     }
 

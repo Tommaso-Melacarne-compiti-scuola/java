@@ -86,7 +86,6 @@ function createEmptyGrid(container, isComputerGrid) {
       cell.style.pointerEvents = "none";
       cell.addEventListener("click", async () => attack(cell, i));
     } else {
-      // Add event listeners for ship placement on player grid
       cell.addEventListener("mouseover", () => previewShipPlacement(cell));
       cell.addEventListener("mouseout", () => clearShipPlacementPreview());
       cell.addEventListener("click", () => placeShip(cell));
@@ -96,6 +95,9 @@ function createEmptyGrid(container, isComputerGrid) {
   }
 }
 
+/**
+ * Initializes the ship placement controls and event listeners.
+ */
 function initShipPlacement() {
   shipsToPlace.innerHTML = "";
   placedShips = [];
@@ -144,7 +146,11 @@ function initShipPlacement() {
   resetPlacementBtn.addEventListener("click", resetShipPlacement);
 }
 
-// Preview ship placement when hovering over a cell
+/**
+ * Preview ship placement when hovering over a cell
+ * 
+ * @param cell {HTMLElement} The cell element being hovered over.
+ */
 function previewShipPlacement(cell) {
   if (selectedShipType === null) return;
 
@@ -269,7 +275,9 @@ function placeShip(cell) {
   }
 }
 
-// Reset ship placement
+/**
+ * Resets the ship placement by clearing all ships from the grid and resetting the state.
+ */
 function resetShipPlacement() {
   playerGrid.querySelectorAll(".cell").forEach((cell) => {
     cell.classList.remove("ship");
@@ -688,11 +696,6 @@ function handleGameOver(gameUpdate) {
  */
 function determineWinner(gameUpdate) {
   try {
-    const playerShipsSunk = countSunkShips(
-      gameUpdate.playerShips,
-      gameUpdate.playerHits,
-    );
-
     const computerSunkCount = gameUpdate.computerHits.filter(
       (hit) => hit.result === "SUNK",
     ).length;
@@ -708,13 +711,15 @@ function determineWinner(gameUpdate) {
   }
 }
 
+const modalElement = document.getElementById("winnerModal");
+const playAgainBtn = document.getElementById("play-again-btn");
+
 /**
  * Shows the winner modal.
  * @param {string} winner - The name of the winner.
  */
 function showWinnerModal(winner) {
   try {
-    const modalElement = document.getElementById("winnerModal");
     if (!modalElement) {
       console.error("Modal element not found!");
       alert(`Game Over! ${winner} wins!`);
@@ -747,7 +752,6 @@ function showWinnerModal(winner) {
       }
     }
 
-    const playAgainBtn = document.getElementById("play-again-btn");
     if (playAgainBtn) {
       const newPlayAgainBtn = playAgainBtn.cloneNode(true);
       playAgainBtn.parentNode.replaceChild(newPlayAgainBtn, playAgainBtn);
